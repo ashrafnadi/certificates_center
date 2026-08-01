@@ -43,11 +43,9 @@ def index(request):
     # ── Base querysets ──
     base_grad_qs = Graduate.objects.filter(**grad_filter)
 
-    # Certificate subquery via SQL IN (SELECT ...)
+    # FIXED #6: Use FK relation instead of raw graduate_id BigInteger filter
     if grad_filter:
-        cert_qs = Certificate.objects.filter(
-            graduate_id__in=base_grad_qs.values("graduate_id")
-        )
+        cert_qs = Certificate.objects.filter(graduate__in=base_grad_qs)
     else:
         cert_qs = Certificate.objects.all()
 
@@ -113,7 +111,6 @@ def index(request):
         context["total_users"] = Users_Profile.objects.count()
         context["upload_errors"] = Upload_Error.objects.count()
 
-        # Fast EXISTS subquery
         context["recent_transactions"] = (
             Transaction.objects.annotate(graduate_count=Count("graduate"))
             .filter(graduate_count__gt=0)
@@ -121,17 +118,17 @@ def index(request):
             .order_by("-transaction_date")[:8]
         )
 
-        # ── Faculty breakdown ──
         if grad_filter:
             all_grad_count = Graduate.objects.count() or 1
         else:
             all_grad_count = total_graduates or 1
 
+        # FIXED #6: Use related_name "graduates" instead of invalid "graduate"
         breakdown_qs = (
             Faculty.objects.annotate(
                 grad_count=Count(
-                    "graduate",
-                    filter=Q(graduate__ischeked="Y") | Q(graduate__ischeked2="Y"),
+                    "graduates",
+                    filter=Q(graduates__ischeked="Y") | Q(graduates__ischeked2="Y"),
                 )
             )
             .filter(grad_count__gt=0)
@@ -159,12 +156,12 @@ def index(request):
             Q(ischeked="Y") & Q(ischeked2="N")
         ).count()
 
-        hist_filter = {}
-        if role == "employee" and selected_faculty_id:
-            hist_filter["faculty_id"] = selected_faculty_id
-        context["recent_history"] = History.objects.filter(**hist_filter).order_by(
-            "-history_date"
-        )[:5]
+    hist_filter = {}
+    if role == "employee" and selected_faculty_id:
+        hist_filter["faculty_id"] = selected_faculty_id
+    context["recent_history"] = History.objects.filter(**hist_filter).order_by(
+        "-history_date"
+    )[:5]
 
     return render(request, "graduates/index.html", context)
 
@@ -173,9 +170,9 @@ def index(request):
 def graduate_list(request):
     """
     Graduate list view with role-based filtering:
-    - Director/Supervisor/Superuser: All faculties → sections → specializations → graduates
-    - Auditor: Login faculty only, ischeked='N', must select section → specialization
-    - Employee: Login faculty only, must select section → specialization
+    - Director/Supervisor/Superuser: All faculties -> sections -> specializations -> graduates
+    - Auditor: Login faculty only, ischeked='N', must select section -> specialization
+    - Employee: Login faculty only, must select section -> specialization
     """
     user = request.user
     role = request.session.get("user_role") or getattr(user, "role", "employee")
@@ -209,14 +206,15 @@ def graduate_list(request):
     # ── Sections list ──
     sections = []
     if current_faculty:
+        # FIXED #2: use corrected field name section_ar_name
         sections = Section.objects.filter(faculty=current_faculty).order_by(
-            "section_ar_namr"
+            "section_ar_name"
         )
 
     # ── Specializations list ──
     specializations = []
     if section_id:
-        specializations = Specialization.objects.filter(section=section_id).order_by(
+        specializations = Specialization.objects.filter(section_id=section_id).order_by(
             "specialization_ar_name"
         )
 
@@ -225,7 +223,7 @@ def graduate_list(request):
     if current_faculty and specialization_id:
         graduates = Graduate.objects.filter(
             faculty=current_faculty,
-            specialization=specialization_id,
+            specialization_id=specialization_id,
         )
 
         # Auditor: only unchecked graduates
@@ -238,12 +236,17 @@ def graduate_list(request):
 
     # ── Graduate detail ──
     selected_graduate = None
+    certificates = []
     if graduate_id:
         selected_graduate = get_object_or_404(
             Graduate.objects.select_related(
                 "nationality", "faculty", "specialization", "faculty_turn", "regulation"
             ),
             graduate_id=graduate_id,
+        )
+        # FIXED #6: Use FK relation instead of raw graduate_id filter
+        certificates = selected_graduate.certificate_set.all().order_by(
+            "-certificate_date"
         )
 
     context = {
@@ -258,11 +261,15 @@ def graduate_list(request):
         "selected_section_id": section_id,
         "selected_specialization_id": specialization_id,
         "selected_graduate": selected_graduate,
+        "certificates": certificates,
     }
 
     # HTMX partial rendering
     if request.headers.get("HX-Request"):
-        if "section_id" in request.GET and "specialization_id" not in request.GET:
+        # FIXED: Handle faculty selection (updates section select + clears specializations)
+        if "faculty_id" in request.GET and "section_id" not in request.GET:
+            return render(request, "graduates/partials/faculty_changed.html", context)
+        elif "section_id" in request.GET and "specialization_id" not in request.GET:
             return render(request, "graduates/partials/specializations.html", context)
         elif "specialization_id" in request.GET and "graduate_id" not in request.GET:
             return render(request, "graduates/partials/graduates_table.html", context)

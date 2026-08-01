@@ -11,7 +11,7 @@
     {% for sp in specializations %}
         <option value="{{ sp.specialization_id }}"
                 {% if selected_specialization_id == sp.specialization_id|stringformat:"s" %}selected{% endif %}>
-            {{ sp.specialization_ar_name }}
+            {{ sp.specialization_ar_name }} - {{ sp.total_score }}
         </option>
     {% endfor %}
 </select>

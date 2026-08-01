@@ -1,0 +1,27 @@
+<!-- Out-of-band update for the section select -->
+<select name="section_id"
+        id="sectionSelect"
+        class="form-select form-select-lg"
+        hx-get="{% url 'graduates:graduate_list' %}"
+        hx-target="#specializationsContainer"
+        hx-swap="innerHTML"
+        hx-indicator="#loadingIndicator"
+        hx-include="[name='faculty_id'],[name='section_id']"
+        hx-swap-oob="outerHTML">
+    <option value="">اختر القسم...</option>
+    {% for s in sections %}
+        <option value="{{ s.section_id }}">{{ s.section_ar_name }}</option>
+    {% endfor %}
+</select>
+<!-- Main response body: empty specialization select -->
+<select name="specialization_id"
+        id="specializationSelect"
+        class="form-select form-select-lg"
+        hx-get="{% url 'graduates:graduate_list' %}"
+        hx-target="#graduatesTableContainer"
+        hx-swap="innerHTML"
+        hx-indicator="#loadingIndicator"
+        hx-include="[name='faculty_id'],[name='section_id'],[name='specialization_id']"
+        disabled>
+    <option value="">اختر التخصص...</option>
+</select>

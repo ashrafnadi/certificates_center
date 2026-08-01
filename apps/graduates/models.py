@@ -14,7 +14,9 @@ class Certificate(models.Model):
     certificate_serial = models.CharField(max_length=20)
     certificate_date = models.DateTimeField()
     certificate_status = models.CharField(max_length=2)
-    graduate = models.ForeignKey("Graduate", on_delete=models.CASCADE, blank=True, null=True)
+    graduate = models.ForeignKey(
+        "Graduate", on_delete=models.CASCADE, blank=True, null=True
+    )
     print_date = models.DateTimeField(blank=True, null=True)
     delivered = models.CharField(max_length=2, blank=True, null=True)
     delivered_date = models.DateTimeField(blank=True, null=True)
@@ -25,6 +27,19 @@ class Certificate(models.Model):
 
     def __str__(self):
         return str(self.certificate_id)
+
+    # FIXED #3: Boolean property for legacy CharField delivered flag
+    @property
+    def is_delivered(self):
+        return self.delivered in ("Y", "y", "1", "T", "t", "True", "true", "YES", "yes")
+
+    @is_delivered.setter
+    def is_delivered(self, value):
+        self.delivered = "Y" if value else "N"
+
+    @property
+    def is_printed(self):
+        return self.print_date is not None
 
 
 class Faculty_Turn(models.Model):
@@ -84,8 +99,13 @@ class Graduate(models.Model):
     )
     lastuser = models.BigIntegerField()
     transdesciption = models.CharField(max_length=200)
+    # FIXED #6: added related_name for clean reverse queries
     faculty = models.ForeignKey(
-        Faculty, on_delete=models.CASCADE, blank=True, null=True
+        Faculty,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="graduates",
     )
     ic_card_init = models.CharField(max_length=20, blank=True, null=True)
 
@@ -94,6 +114,31 @@ class Graduate(models.Model):
 
     def __str__(self):
         return str(self.graduate_id)
+
+    # FIXED #3: Boolean properties for legacy CharField flags
+    @property
+    def is_checked(self):
+        return self.ischeked in ("Y", "y", "1", "T", "t", "True", "true", "YES", "yes")
+
+    @is_checked.setter
+    def is_checked(self, value):
+        self.ischeked = "Y" if value else "N"
+
+    @property
+    def is_checked2(self):
+        return self.ischeked2 in ("Y", "y", "1", "T", "t", "True", "true", "YES", "yes")
+
+    @is_checked2.setter
+    def is_checked2(self, value):
+        self.ischeked2 = "Y" if value else "N"
+
+    @property
+    def is_deleted(self):
+        return self.isdelete in ("Y", "y", "1", "T", "t", "True", "true", "YES", "yes")
+
+    @is_deleted.setter
+    def is_deleted(self, value):
+        self.isdelete = "Y" if value else "N"
 
 
 class History(models.Model):

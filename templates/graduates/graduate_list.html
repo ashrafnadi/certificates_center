@@ -72,7 +72,7 @@
                 {% for s in sections %}
                     <option value="{{ s.section_id }}"
                             {% if selected_section_id == s.section_id|stringformat:"s" %}selected{% endif %}>
-                        {{ s.section_ar_namr }}
+                        {{ s.section_ar_name }}
                     </option>
                 {% endfor %}
             </select>

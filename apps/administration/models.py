@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db import transaction
 
 
 class Authenticated_User(models.Model):
@@ -88,7 +89,8 @@ class Nationality(models.Model):
 
 class Section(models.Model):
     section_id = models.BigIntegerField(primary_key=True)
-    section_ar_namr = models.CharField(max_length=400)
+    # FIXED #2: typo corrected; db_column preserves legacy DB compatibility
+    section_ar_name = models.CharField(max_length=400, db_column="section_ar_namr")
     section_en_name = models.CharField(max_length=400, blank=True, null=True)
     faculty = models.ForeignKey(
         Faculty, on_delete=models.CASCADE, blank=True, null=True
@@ -198,6 +200,46 @@ class Users_Profile(models.Model):
         if self.isadmin not in (None, "", "0", "no", "false", "No", "False"):
             return False
         return self.role in (self.ROLE_AUDITOR, self.ROLE_EMPLOYEE)
+
+    # FIXED #4: Auto-sync Django User to prevent drift between user stores
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+
+            is_staff = self.isadmin not in (
+                None,
+                "",
+                "0",
+                "no",
+                "false",
+                "No",
+                "False",
+            )
+
+            if not self.user:
+                user, created = User.objects.get_or_create(
+                    username=self.user_name,
+                    defaults={
+                        "email": self.user_email or "",
+                        "first_name": self.user_short_name or "",
+                        "is_staff": is_staff,
+                        "is_active": True,
+                    },
+                )
+                if not created:
+                    user.email = self.user_email or ""
+                    user.first_name = self.user_short_name or ""
+                    user.is_staff = is_staff
+                    user.save()
+                self.user = user
+                # Update DB without triggering recursion
+                Users_Profile.objects.filter(pk=self.pk).update(user=user)
+            else:
+                self.user.username = self.user_name
+                self.user.email = self.user_email or ""
+                self.user.first_name = self.user_short_name or ""
+                self.user.is_staff = is_staff
+                self.user.save()
 
 
 class Grade(models.Model):
