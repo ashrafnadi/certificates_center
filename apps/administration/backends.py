@@ -1,7 +1,7 @@
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.hashers import check_password
 
-from .models import users_profile
+from .models import Users_Profile
 
 
 class UsersProfileAuthBackend(BaseBackend):
@@ -15,8 +15,8 @@ class UsersProfileAuthBackend(BaseBackend):
             return None
 
         try:
-            profile = users_profile.objects.get(user_name=username)
-        except users_profile.DoesNotExist:
+            profile = Users_Profile.objects.get(user_name=username)
+        except Users_Profile.DoesNotExist:
             return None
 
         # التحقق من كلمة المرور
@@ -58,7 +58,7 @@ class UsersProfileAuthBackend(BaseBackend):
 
     def get_user(self, user_id):
         try:
-            profile = users_profile.objects.get(pk=user_id)
+            profile = Users_Profile.objects.get(pk=user_id)
             profile.backend = "apps.administration.backends.UsersProfileAuthBackend"
             profile.is_authenticated = True
             profile.is_active = True
@@ -81,5 +81,5 @@ class UsersProfileAuthBackend(BaseBackend):
             profile.get_session_auth_hash = lambda self=profile: str(self.user_id)
             profile.get_username = lambda self=profile: self.user_name
             return profile
-        except users_profile.DoesNotExist:
+        except Users_Profile.DoesNotExist:
             return None

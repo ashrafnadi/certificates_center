@@ -1,7 +1,8 @@
 from django.db import models
+from apps.administration.models import Faculty, Authenticated_User
 
 
-class certificate(models.Model):
+class Certificate(models.Model):
     certificate_id = models.BigIntegerField(primary_key=True)
     certificate_serial = models.CharField(max_length=20)
     certificate_date = models.DateTimeField()
@@ -19,9 +20,11 @@ class certificate(models.Model):
         return str(self.certificate_id)
 
 
-class faculty_turn(models.Model):
+class Faculty_Turn(models.Model):
     faculty_turn_id = models.BigIntegerField(primary_key=True)
-    faculty_id = models.BigIntegerField()
+    faculty_id = models.ForeignKey(
+        Faculty, on_delete=models.CASCADE, blank=True, null=True
+    )
     turn_ar_name = models.CharField(max_length=30)
     turn_en_name = models.CharField(max_length=30)
     turn_cad_date = models.DateTimeField()
@@ -37,7 +40,7 @@ class faculty_turn(models.Model):
         return str(self.faculty_turn_id)
 
 
-class graduate(models.Model):
+class Graduate(models.Model):
     graduate_id = models.BigIntegerField(primary_key=True)
     graduate_id_card = models.DecimalField(max_digits=20, decimal_places=0)
     graduate_ar_name = models.CharField(max_length=400)
@@ -45,7 +48,9 @@ class graduate(models.Model):
     graduate_ar_pob = models.CharField(max_length=100)
     graduate_en_pob = models.CharField(max_length=100)
     graduate_dob = models.DateTimeField()
-    nationality_id = models.BigIntegerField()
+    nationality_id = models.ForeignKey(
+        "administration.Nationality", on_delete=models.CASCADE, blank=True, null=True
+    )
     graduate_gendar = models.SmallIntegerField()
     graduate_notes = models.CharField(max_length=200, blank=True, null=True)
     score = models.DecimalField(max_digits=9, decimal_places=3)
@@ -57,14 +62,24 @@ class graduate(models.Model):
     grade_name_en = models.CharField(max_length=50, blank=True, null=True)
     ischeked = models.CharField(max_length=2)
     ischeked2 = models.CharField(max_length=20)
-    specialization_id = models.BigIntegerField()
-    faculty_turn_id = models.BigIntegerField()
-    regulation_id = models.BigIntegerField()
+    specialization_id = models.ForeignKey(
+        "administration.Specialization", on_delete=models.CASCADE, blank=True, null=True
+    )
+    faculty_turn_id = models.ForeignKey(
+        "Faculty_Turn", on_delete=models.CASCADE, blank=True, null=True
+    )
+    regulation_id = models.ForeignKey(
+        "administration.Regulation", on_delete=models.CASCADE, blank=True, null=True
+    )
     isdelete = models.CharField(max_length=2, blank=True, null=True)
-    transaction_id = models.BigIntegerField()
+    transaction_id = models.ForeignKey(
+        "administration.Transaction", on_delete=models.CASCADE, blank=True, null=True
+    )
     lastuser = models.BigIntegerField()
     transdesciption = models.CharField(max_length=200)
-    faculty_id = models.BigIntegerField(blank=True, null=True)
+    faculty_id = models.ForeignKey(
+        Faculty, on_delete=models.CASCADE, blank=True, null=True
+    )
     ic_card_init = models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
@@ -72,3 +87,28 @@ class graduate(models.Model):
 
     def __str__(self):
         return str(self.graduate_id)
+
+
+class History(models.Model):
+    history_id = models.DecimalField(primary_key=True, max_digits=20, decimal_places=0)
+    row_id = models.ForeignKey(
+        Graduate, on_delete=models.CASCADE, blank=True, null=True
+    )
+    history_date = models.DateTimeField(blank=True, null=True)
+    history_field = models.CharField(max_length=400, blank=True, null=True)
+    history_old = models.CharField(max_length=400, blank=True, null=True)
+    history_new = models.CharField(max_length=400, blank=True, null=True)
+    history_type = models.CharField(max_length=20, blank=True, null=True)
+    history_desc = models.CharField(max_length=200, blank=True, null=True)
+    authunticated_user_id = models.ForeignKey(
+        Authenticated_User, on_delete=models.CASCADE, blank=True, null=True
+    )
+    faculty_id = models.ForeignKey(
+        Faculty, on_delete=models.CASCADE, blank=True, null=True
+    )
+
+    class Meta:
+        ordering = ("history_id",)
+
+    def __str__(self):
+        return str(self.history_id)

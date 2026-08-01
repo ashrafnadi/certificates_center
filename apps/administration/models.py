@@ -1,30 +1,21 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
-class authorize_user(models.Model):
-    authorize_user_id = models.BigIntegerField(primary_key=True)
-    user_id = models.BigIntegerField()
-    motherboard_id = models.BigIntegerField()
-    isfirstlog = models.CharField(max_length=20)
-    browser = models.CharField(max_length=20, blank=True, null=True)
-
-    class Meta:
-        ordering = ("authorize_user_id",)
-
-    def __str__(self):
-        return str(self.authorize_user_id)
-
-
-class authenticated_user(models.Model):
+class Authenticated_User(models.Model):
     authunticated_user_id = models.BigIntegerField(primary_key=True)
-    authorize_user_id = models.BigIntegerField()
-    faculty_id = models.BigIntegerField()
-    isadd = models.CharField(max_length=2)
-    isedit = models.CharField(max_length=2)
-    isdelete = models.CharField(max_length=2)
-    isprint = models.CharField(max_length=2)
-    iscommit = models.CharField(max_length=2)
-    isview = models.CharField(max_length=2)
+    authorize_user_id = models.ForeignKey(
+        "Users_Profile", on_delete=models.CASCADE, blank=True, null=True
+    )
+    faculty_id = models.ForeignKey(
+        "Faculty", on_delete=models.CASCADE, blank=True, null=True
+    )
+    isadd = models.BooleanField(default=False)
+    isedit = models.BooleanField(default=False)
+    isdelete = models.BooleanField(default=False)
+    isprint = models.BooleanField(default=False)
+    iscommit = models.BooleanField(default=False)
+    isview = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("authunticated_user_id",)
@@ -33,22 +24,7 @@ class authenticated_user(models.Model):
         return str(self.authunticated_user_id)
 
 
-class certificate_counter(models.Model):
-    certificate_counter_id = models.BigIntegerField(primary_key=True)
-    graduate_id = models.BigIntegerField()
-    certificate_count = models.BigIntegerField()
-    certificate_date = models.DateTimeField()
-    certificate_user = models.BigIntegerField()
-    certificate_type = models.CharField(max_length=20)
-
-    class Meta:
-        ordering = ("certificate_counter_id",)
-
-    def __str__(self):
-        return str(self.certificate_counter_id)
-
-
-class data(models.Model):
+class System_Settings(models.Model):
     data_id = models.SmallIntegerField(primary_key=True)
     admin_name = models.CharField(max_length=100)
     super_name = models.CharField(max_length=200)
@@ -66,11 +42,13 @@ class data(models.Model):
         return str(self.data_id)
 
 
-class degree(models.Model):
+class Degree(models.Model):
     degree_id = models.BigIntegerField(primary_key=True)
     degree_ar_name = models.CharField(max_length=200)
     degree_en_name = models.CharField(max_length=200)
-    faculty_id = models.BigIntegerField()
+    faculty_id = models.ForeignKey(
+        "Faculty", on_delete=models.CASCADE, blank=True, null=True
+    )
 
     class Meta:
         ordering = ("degree_id",)
@@ -79,7 +57,7 @@ class degree(models.Model):
         return str(self.degree_id)
 
 
-class faculty(models.Model):
+class Faculty(models.Model):
     faculty_id = models.BigIntegerField(primary_key=True)
     faculty_ar_name = models.CharField(max_length=200)
     faculty_en_name = models.CharField(max_length=200)
@@ -96,39 +74,7 @@ class faculty(models.Model):
         return str(self.faculty_ar_name)
 
 
-class history(models.Model):
-    history_id = models.DecimalField(primary_key=True, max_digits=20, decimal_places=0)
-    table_id = models.BigIntegerField()
-    row_id = models.DecimalField(max_digits=20, decimal_places=0, blank=True, null=True)
-    history_date = models.DateTimeField(blank=True, null=True)
-    history_field = models.CharField(max_length=400, blank=True, null=True)
-    history_old = models.CharField(max_length=400, blank=True, null=True)
-    history_new = models.CharField(max_length=400, blank=True, null=True)
-    history_type = models.CharField(max_length=20, blank=True, null=True)
-    history_desc = models.CharField(max_length=200, blank=True, null=True)
-    authunticated_user_id = models.BigIntegerField(blank=True, null=True)
-    faculty_id = models.BigIntegerField()
-
-    class Meta:
-        ordering = ("history_id",)
-
-    def __str__(self):
-        return str(self.history_id)
-
-
-class motherboard(models.Model):
-    motherboard_id = models.BigIntegerField(primary_key=True)
-    motherboard_serial = models.CharField(max_length=100)
-    motherboard_computer = models.CharField(max_length=20)
-
-    class Meta:
-        ordering = ("motherboard_id",)
-
-    def __str__(self):
-        return str(self.motherboard_id)
-
-
-class nationality(models.Model):
+class Nationality(models.Model):
     nationality_id = models.BigIntegerField(primary_key=True)
     nationality_ar_name = models.CharField(max_length=200)
     nationality_en_name = models.CharField(max_length=200)
@@ -140,11 +86,13 @@ class nationality(models.Model):
         return str(self.nationality_id)
 
 
-class section(models.Model):
+class Section(models.Model):
     section_id = models.BigIntegerField(primary_key=True)
     section_ar_namr = models.CharField(max_length=400)
     section_en_name = models.CharField(max_length=400, blank=True, null=True)
-    faculty_id = models.BigIntegerField()
+    faculty_id = models.ForeignKey(
+        Faculty, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     class Meta:
         ordering = ("section_id",)
@@ -153,11 +101,13 @@ class section(models.Model):
         return str(self.section_id)
 
 
-class specialization(models.Model):
+class Specialization(models.Model):
     specialization_id = models.BigIntegerField(primary_key=True)
     specialization_ar_name = models.CharField(max_length=400)
     specialization_en_name = models.CharField(max_length=400)
-    section_id = models.BigIntegerField()
+    section_id = models.ForeignKey(
+        Section, on_delete=models.CASCADE, blank=True, null=True
+    )
     total_score = models.IntegerField(blank=True, null=True)
     ishours = models.CharField(max_length=2, blank=True, null=True)
     gawda_no = models.IntegerField(blank=True, null=True)
@@ -170,12 +120,14 @@ class specialization(models.Model):
         return str(self.specialization_id)
 
 
-class transaction(models.Model):
+class Transaction(models.Model):
     transaction_id = models.BigIntegerField(primary_key=True)
     transaction_date = models.DateTimeField()
     user_id = models.BigIntegerField()
     transaction_descripsion = models.CharField(max_length=100)
-    faculty_id = models.BigIntegerField()
+    faculty_id = models.ForeignKey(
+        "Faculty", on_delete=models.CASCADE, blank=True, null=True
+    )
 
     class Meta:
         ordering = ("transaction_id",)
@@ -184,15 +136,13 @@ class transaction(models.Model):
         return str(self.transaction_id)
 
 
-class upload_error(models.Model):
+class Upload_Error(models.Model):
     error_id = models.BigIntegerField(primary_key=True)
-    faculty_id = models.BigIntegerField(
-        blank=True,
-        null=True,
+    faculty_id = models.ForeignKey(
+        "Faculty", on_delete=models.CASCADE, blank=True, null=True
     )
-    user_id = models.BigIntegerField(
-        blank=True,
-        null=True,
+    user_id = models.ForeignKey(
+        "Users_Profile", on_delete=models.CASCADE, blank=True, null=True
     )
     graduate_id_card = models.CharField(max_length=20, blank=True, null=True)
     error_desc = models.CharField(max_length=100, blank=True, null=True)
@@ -205,7 +155,7 @@ class upload_error(models.Model):
         return str(self.error_id)
 
 
-class users_profile(models.Model):
+class Users_Profile(models.Model):
     ROLE_SUPERVISOR = "supervisor"
     ROLE_DIRECTOR = "director"
     ROLE_AUDITOR = "auditor"
@@ -218,7 +168,8 @@ class users_profile(models.Model):
         (ROLE_EMPLOYEE, "موظف"),
     )
 
-    user_id = models.BigIntegerField(primary_key=True)
+    id = models.BigIntegerField(primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     user_name = models.CharField(max_length=60)
     user_short_name = models.CharField(max_length=200)
     user_password = models.CharField(max_length=130)
@@ -247,7 +198,7 @@ class users_profile(models.Model):
         return self.role in (self.ROLE_AUDITOR, self.ROLE_EMPLOYEE)
 
 
-class grade(models.Model):
+class Grade(models.Model):
     grade_id = models.BigIntegerField(primary_key=True)
     grade_ar_name = models.CharField(max_length=40)
     grade_en_name = models.CharField(max_length=40)
@@ -259,7 +210,7 @@ class grade(models.Model):
         return str(self.grade_id)
 
 
-class regulation(models.Model):
+class Regulation(models.Model):
     regulation_id = models.BigIntegerField(primary_key=True)
     regulation_ar_name = models.CharField(max_length=200)
     degree_id = models.BigIntegerField()
@@ -271,7 +222,7 @@ class regulation(models.Model):
         return str(self.regulation_id)
 
 
-class regulation_grade(models.Model):
+class Regulation_Grade(models.Model):
     regulation_grade_id = models.BigIntegerField(primary_key=True)
     regulation_id = models.BigIntegerField()
     grade_id = models.BigIntegerField()

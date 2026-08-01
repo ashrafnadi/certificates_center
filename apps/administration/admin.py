@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import faculty, users_profile
+from .models import Faculty, Users_Profile
 
 
-@admin.register(users_profile)
+@admin.register(Users_Profile)
 class UsersProfileAdmin(admin.ModelAdmin):
     list_display = (
         "user_id",
@@ -18,7 +18,7 @@ class UsersProfileAdmin(admin.ModelAdmin):
     list_editable = ("role", "isadmin")
 
 
-@admin.register(faculty)
+@admin.register(Faculty)
 class FacultyAdmin(admin.ModelAdmin):
     list_display = ("faculty_id", "faculty_ar_name", "faculty_en_name")
     search_fields = ("faculty_ar_name", "faculty_en_name")

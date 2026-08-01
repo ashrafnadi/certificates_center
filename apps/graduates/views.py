@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from apps.administration.models import (
-    users_profile,
-    faculty,
-    upload_error,
-    transaction,
-    history,
+    Users_Profile,
+    Faculty,
+    Upload_Error,
+    Transaction,
 )
-from apps.graduates.models import graduate, certificate
+from apps.graduates.models import Graduate, Certificate,History
 
 
 @login_required
@@ -53,14 +52,14 @@ def index(request):
     # Graduate IDs for certificate filtering (schema uses plain IDs, not FKs)
     if grad_filter:
         graduate_ids = list(
-            graduate.objects.filter(**grad_filter).values_list("graduate_id", flat=True)
+            Graduate.objects.filter(**grad_filter).values_list("graduate_id", flat=True)
         )
-        cert_qs = certificate.objects.filter(graduate_id__in=graduate_ids)
+        cert_qs = Certificate.objects.filter(graduate_id__in=graduate_ids)
     else:
-        cert_qs = certificate.objects.all()
+        cert_qs = Certificate.objects.all()
 
     # Core counts
-    total_graduates = graduate.objects.filter(**grad_filter).count()
+    total_graduates = Graduate.objects.filter(**grad_filter).count()
     total_certificates = cert_qs.count()
     printed_certificates = cert_qs.exclude(print_date=None).count()
     delivered_certificates = cert_qs.filter(delivered="1").count()
@@ -88,7 +87,7 @@ def index(request):
         "user_role": role,
         "user_role_display": "مدير النظام"
         if request.user.is_superuser
-        else dict(users_profile.ROLE_CHOICES).get(role, role),
+        else dict(Users_Profile.ROLE_CHOICES).get(role, role),
         "scope_label": scope_label,
         "selected_faculty_name": selected_faculty_name,
         # Core KPIs
@@ -101,7 +100,7 @@ def index(request):
         "pending_pct": pending_pct,
         "deliver_pct": deliver_pct,
         # Recent lists
-        "recent_graduates": graduate.objects.filter(**grad_filter).order_by(
+        "recent_graduates": Graduate.objects.filter(**grad_filter).order_by(
             "-graduate_id"
         )[:6],
         "recent_certificates": cert_qs.order_by("-certificate_date")[:5],
@@ -111,19 +110,19 @@ def index(request):
     # DIRECTOR / SUPERVISOR KPIs
     # ═══════════════════════════════════════════════════
     if role in ("director", "supervisor") or is_admin or is_superuser:
-        context["total_faculties"] = faculty.objects.count()
-        context["total_users"] = users_profile.objects.count()
-        context["upload_errors"] = upload_error.objects.count()
-        context["recent_transactions"] = transaction.objects.order_by(
+        context["total_faculties"] = Faculty.objects.count()
+        context["total_users"] = Users_Profile.objects.count()
+        context["upload_errors"] = Upload_Error.objects.count()
+        context["recent_transactions"] = Transaction.objects.order_by(
             "-transaction_date"
         )[:5]
 
         # Faculty breakdown with percentages
         breakdown = []
-        all_grad_count = graduate.objects.count() or 1  # avoid div by zero
-        for f in faculty.objects.all().order_by("faculty_ar_name"):
+        all_grad_count = Graduate.objects.count() or 1  # avoid div by zero
+        for f in Faculty.objects.all().order_by("faculty_ar_name"):
             count = (
-                graduate.objects.filter(faculty_id=f.faculty_id)
+                Graduate.objects.filter(faculty_id=f.faculty_id)
                 .exclude(ischeked="N", ischeked2="N")
                 .count()
             )
@@ -145,7 +144,7 @@ def index(request):
     # ═══════════════════════════════════════════════════
     if role == "auditor" or is_admin or is_superuser:
         context["unchecked_graduates"] = (
-            graduate.objects.filter(**grad_filter)
+            Graduate.objects.filter(**grad_filter)
             .exclude(ischeked="Y", ischeked2="Y")
             .count()
         )
@@ -153,7 +152,7 @@ def index(request):
         hist_filter = {}
         if role == "employee" and selected_faculty_id:
             hist_filter["faculty_id"] = selected_faculty_id
-        context["recent_history"] = history.objects.filter(**hist_filter).order_by(
+        context["recent_history"] = History.objects.filter(**hist_filter).order_by(
             "-history_date"
         )[:5]
 

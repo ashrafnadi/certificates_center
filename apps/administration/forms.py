@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import faculty
+from .models import Faculty
 
 
 class LoginForm(forms.Form):
@@ -20,7 +20,7 @@ class LoginForm(forms.Form):
         })
     )
     faculty = forms.ModelChoiceField(
-        queryset=faculty.objects.none(),
+        queryset=Faculty.objects.none(),
         label='الكلية',
         required=False,
         empty_label='-- اختر الكلية --',
@@ -31,4 +31,4 @@ class LoginForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['faculty'].queryset = faculty.objects.all().order_by('faculty_ar_name')
+        self.fields['faculty'].queryset = Faculty.objects.all().order_by('faculty_ar_name')

@@ -256,7 +256,7 @@
     <!-- ===== Recent Graduates & Certificates ===== -->
     <div class="row g-3">
         <!-- Recent Graduates -->
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>آخر الخريجين</h5>
@@ -271,6 +271,7 @@
                                     <th class="border-0">الاسم</th>
                                     <th class="border-0">الرقم القومي</th>
                                     <th class="border-0">الدرجة</th>
+                                    <th class="border-0">الكلية</th>
                                     <th class="border-0">الحالة</th>
                                 </tr>
                             </thead>
@@ -281,6 +282,7 @@
                                         <td class="fw-semibold">{{ g.graduate_ar_name|truncatechars:25 }}</td>
                                         <td><small class="font-monospace">{{ g.graduate_id_card }}</small></td>
                                         <td><span class="badge bg-light text-dark">{{ g.grade_name_ar|default:"--" }}</span></td>
+                                        <td><span class="badge bg-light text-dark">{{ g.faculty_name_ar|default:"--" }}</span></td>
                                         <td>
                                             {% if g.ischeked == "1" %}
                                                 <span class="badge bg-success">مدقق</span>
@@ -303,53 +305,6 @@
                 </div>
             </div>
         </div>
-        <!-- Recent Certificates -->
-        <div class="col-12 col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-file-earmark-text-fill me-2 text-success"></i>آخر الشهادات</h5>
-                    <a href="#" class="btn btn-sm btn-outline-success">عرض الكل</a>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table">
-                                <tr>
-                                    <th class="border-0">#</th>
-                                    <th class="border-0">الرقم التسلسلي</th>
-                                    <th class="border-0">التاريخ</th>
-                                    <th class="border-0">الحالة</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for c in recent_certificates %}
-                                    <tr>
-                                        <td><span class="badge bg-light text-dark">{{ c.certificate_id }}</span></td>
-                                        <td class="fw-semibold font-monospace">{{ c.certificate_serial }}</td>
-                                        <td><small class="text-muted">{{ c.certificate_date|date:"Y-m-d" }}</small></td>
-                                        <td>
-                                            {% if c.delivered == "1" %}
-                                                <span class="badge bg-success"><i class="bi bi-check me-1"></i>مسلّمة</span>
-                                            {% elif c.print_date %}
-                                                <span class="badge bg-info"><i class="bi bi-printer me-1"></i>مطبوعة</span>
-                                            {% else %}
-                                                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass me-1"></i>قيد الانتظار</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% empty %}
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">
-                                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                                            لا يوجد شهادات مسجلة
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     </div>
 {% endblock %}
