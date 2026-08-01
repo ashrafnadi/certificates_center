@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
 
     "apps.administration",
-    "apps.graduate",
+    "apps.graduates",
 ]
 
 

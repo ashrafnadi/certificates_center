@@ -1,5 +1,10 @@
 /* ============================================
-   VARIABLES
+   CERTIFICATES CENTER - CUSTOM STYLES
+   All inline styles moved to classes
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES
    ============================================ */
 :root {
     --sidebar-width: 260px;
@@ -129,7 +134,7 @@
     transition: margin-right var(--transition-speed) ease;
 }
 
-.sidebar.collapsed~.main-content {
+.sidebar.collapsed ~ .main-content {
     margin-right: var(--sidebar-collapsed-width);
 }
 
@@ -146,6 +151,10 @@
     background: rgba(0, 0, 0, 0.45);
     backdrop-filter: blur(2px);
     z-index: 1025;
+}
+
+.sidebar-overlay.show {
+    display: block;
 }
 
 /* ============================================
@@ -166,7 +175,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+    background: url("https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80") center/cover no-repeat;
     z-index: 0;
 }
 
@@ -267,6 +276,31 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+
+.stat-icon-sm {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   PROGRESS BARS
+   ============================================ */
+.progress-thin {
+    height: 4px;
+}
+
+.progress-md {
+    height: 8px;
+}
+
+.progress-bar-dynamic {
+    width: var(--pct, 0%);
 }
 
 /* ============================================
@@ -394,10 +428,6 @@
     .main-content {
         margin-right: 0;
     }
-
-    .sidebar-overlay.show {
-        display: block;
-    }
 }
 
 /* ============================================
@@ -420,6 +450,11 @@
 
     .stat-icon i {
         font-size: 1.4rem !important;
+    }
+
+    .stat-icon-sm {
+        width: 40px;
+        height: 40px;
     }
 
     .quick-action-card {

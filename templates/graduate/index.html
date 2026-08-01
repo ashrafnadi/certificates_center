@@ -1,20 +1,80 @@
 {% extends 'base.html' %}
-{% block title %}الرئيسية - {{ APPLICATION_NAME }}{% endblock %}
+{% block title %}لوحة التحكم - {{ APPLICATION_NAME }}{% endblock %}
 {% block content %}
-    <div class="row g-3 g-lg-4">
-        <!-- Header -->
+    <!-- ===== Welcome Header ===== -->
+    <div class="row g-3 mb-4">
         <div class="col-12">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                <h4 class="mb-0"><i class="bi bi-speedometer2 me-2 text-primary"></i>لوحة التحكم</h4>
-                <span class="badge bg-primary rounded-pill">
-                    <i class="bi bi-person-circle me-1"></i>
-                    {{ user.user_short_name|default:user.username }}
-                </span>
+            <div class="card border-0 shadow-sm bg-primary bg-gradient text-white">
+                <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <div>
+                        <h4 class="mb-1 fw-bold">
+                            <i class="bi bi-speedometer2 me-2"></i>
+                            لوحة التحكم
+                        </h4>
+                        <p class="mb-0 opacity-75">
+                            مرحباً، <strong>{{ user.user_short_name|default:user.username }}</strong>
+                            <span class="mx-2">|</span>
+                            <span class="badge bg-white text-primary">{{ user_role_display }}</span>
+                            {% if selected_faculty_name %}
+                                <span class="mx-2">|</span>
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-building me-1"></i>{{ selected_faculty_name }}
+                                </span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="text-start">
+                        <small class="d-block opacity-75">نطاق البيانات</small>
+                        <span class="badge bg-white text-primary fs-6">{{ scope_label }}</span>
+                    </div>
+                </div>
             </div>
-            <hr class="text-secondary opacity-25" />
         </div>
-        <!-- Stats Cards -->
-        <div class="col-6 col-md-6 col-lg-3">
+    </div>
+    <!-- ===== Quick Actions (Employee Focus) ===== -->
+    {% if user_role == "employee" %}
+        <div class="row g-3 mt-2">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header border-bottom">
+                        <h5 class="mb-0"><i class="bi bi-lightning-charge me-2 text-warning"></i>إجراءات سريعة</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6 col-sm-3">
+                                <a href="#" class="quick-action-card">
+                                    <i class="bi bi-person-plus fs-2 text-primary"></i>
+                                    <span>إضافة خريج</span>
+                                </a>
+                            </div>
+                            <div class="col-6 col-sm-3">
+                                <a href="#" class="quick-action-card">
+                                    <i class="bi bi-printer fs-2 text-success"></i>
+                                    <span>طباعة شهادة</span>
+                                </a>
+                            </div>
+                            <div class="col-6 col-sm-3">
+                                <a href="#" class="quick-action-card">
+                                    <i class="bi bi-search fs-2 text-info"></i>
+                                    <span>بحث عن خريج</span>
+                                </a>
+                            </div>
+                            <div class="col-6 col-sm-3">
+                                <a href="#" class="quick-action-card">
+                                    <i class="bi bi-check-square fs-2 text-warning"></i>
+                                    <span>تدقيق بيانات</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <!-- ===== Core KPI Cards (All Roles) ===== -->
+    <div class="row g-3 mb-4">
+        <!-- Total Graduates -->
+        <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 stat-card">
                 <div class="card-body">
                     <div class="d-flex align-items-center gap-3">
@@ -23,140 +83,371 @@
                         </div>
                         <div>
                             <h6 class="text-muted mb-1 small">الخريجين</h6>
-                            <h4 class="mb-0 fw-bold">0</h4>
+                            <h3 class="mb-0 fw-bold">{{ total_graduates }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100 stat-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-file-earmark-check fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted mb-1 small">الشهادات المطبوعة</h6>
-                            <h4 class="mb-0 fw-bold">0</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100 stat-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                            <i class="bi bi-clock-history fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted mb-1 small">قيد الانتظار</h6>
-                            <h4 class="mb-0 fw-bold">0</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-6 col-lg-3">
+        <!-- Total Certificates -->
+        <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 stat-card">
                 <div class="card-body">
                     <div class="d-flex align-items-center gap-3">
                         <div class="stat-icon bg-info bg-opacity-10 text-info">
-                            <i class="bi bi-building fs-3"></i>
+                            <i class="bi bi-file-earmark-text fs-3"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted mb-1 small">الكليات</h6>
-                            <h4 class="mb-0 fw-bold">0</h4>
+                            <h6 class="text-muted mb-1 small">الشهادات</h6>
+                            <h3 class="mb-0 fw-bold">{{ total_certificates }}</h3>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Quick Actions -->
-        <div class="col-12 col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0"><i class="bi bi-lightning-charge me-2 text-warning"></i>الوصول السريع</h5>
-                </div>
+        <!-- Printed Certificates -->
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 stat-card">
                 <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-6 col-sm-4">
-                            <a href="#" class="quick-action-card">
-                                <i class="bi bi-person-plus fs-2 text-primary"></i>
-                                <span>إضافة خريج</span>
-                            </a>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success">
+                            <i class="bi bi-printer fs-3"></i>
                         </div>
-                        <div class="col-6 col-sm-4">
-                            <a href="#" class="quick-action-card">
-                                <i class="bi bi-printer fs-2 text-success"></i>
-                                <span>طباعة شهادة</span>
-                            </a>
-                        </div>
-                        <div class="col-6 col-sm-4">
-                            <a href="#" class="quick-action-card">
-                                <i class="bi bi-search fs-2 text-info"></i>
-                                <span>بحث</span>
-                            </a>
-                        </div>
-                        <div class="col-6 col-sm-4">
-                            <a href="#" class="quick-action-card">
-                                <i class="bi bi-upload fs-2 text-warning"></i>
-                                <span>استيراد بيانات</span>
-                            </a>
-                        </div>
-                        <div class="col-6 col-sm-4">
-                            <a href="#" class="quick-action-card">
-                                <i class="bi bi-file-earmark-arrow-down fs-2 text-danger"></i>
-                                <span>تصدير Excel</span>
-                            </a>
-                        </div>
-                        <div class="col-6 col-sm-4">
-                            <a href="#" class="quick-action-card">
-                                <i class="bi bi-gear fs-2 text-secondary"></i>
-                                <span>الإعدادات</span>
-                            </a>
+                        <div>
+                            <h6 class="text-muted mb-1 small">مطبوعة</h6>
+                            <h3 class="mb-0 fw-bold">{{ printed_certificates }}</h3>
                         </div>
                     </div>
+                    {% if total_certificates > 0 %}
+                        <div class="mt-2">
+                            <div class="progress progress-thin">
+                                <div class="progress-bar progress-bar-dynamic bg-success"
+                                     style="--pct: {{ print_pct }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ print_pct }}% من الإجمالي</small>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <!-- System Info -->
-        <div class="col-12 col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0"><i class="bi bi-info-circle me-2 text-info"></i>معلومات النظام</h5>
-                </div>
+        <!-- Pending Certificates -->
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100 stat-card">
                 <div class="card-body">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">اسم النظام</span>
-                            <span class="fw-semibold">{{ APPLICATION_NAME }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">النسخة</span>
-                            <span class="fw-semibold">1.0</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">الكلية المختارة</span>
-                            <span class="fw-semibold text-primary">{{ request.session.selected_faculty_name|default:"--" }}</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between px-0">
-                            <span class="text-muted">الدور</span>
-                            <span class="fw-semibold">
-                                {% with role=user.role|default:"" %}
-                                    {% if role == "supervisor" %}مشرف
-                                    {% elif role == "director" %}مدير
-                                    {% elif role == "auditor" %}مدقق
-                                    {% elif role == "employee" %}موظف
-                                {% else %}--{% endif %}
-                            {% endwith %}
-                        </span>
-                    </li>
-                </ul>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-hourglass-split fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-1 small">قيد الانتظار</h6>
+                            <h3 class="mb-0 fw-bold">{{ pending_certificates }}</h3>
+                        </div>
+                    </div>
+                    {% if total_certificates > 0 %}
+                        <div class="mt-2">
+                            <div class="progress progress-thin">
+                                <div class="progress-bar progress-bar-dynamic bg-warning"
+                                     style="--pct: {{ pending_pct }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ pending_pct }}% غير مطبوعة</small>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+    <!-- ===== Secondary KPI Row ===== -->
+    <div class="row g-3 mb-4">
+        <!-- Delivered -->
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="card border-0 shadow-sm h-100 stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-icon-sm bg-success bg-opacity-10 text-success mx-auto mb-2">
+                        <i class="bi bi-check-circle fs-4"></i>
+                    </div>
+                    <h6 class="text-muted mb-1 small">مسلّمة</h6>
+                    <h4 class="mb-0 fw-bold text-success">{{ delivered_certificates }}</h4>
+                    {% if total_certificates > 0 %}
+                        <small class="text-muted">{{ deliver_pct }}%</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% if user_role == "auditor" or user.is_staff %}
+            <!-- Unchecked Graduates (Auditor) -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card border-0 shadow-sm h-100 stat-card">
+                    <div class="card-body text-center">
+                        <div class="stat-icon-sm bg-danger bg-opacity-10 text-danger mx-auto mb-2">
+                            <i class="bi bi-exclamation-triangle fs-4"></i>
+                        </div>
+                        <h6 class="text-muted mb-1 small">غير مدقق</h6>
+                        <h4 class="mb-0 fw-bold text-danger">{{ unchecked_graduates }}</h4>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if user_role == "director" or user_role == "supervisor" or user.is_staff %}
+            <!-- Total Faculties -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card border-0 shadow-sm h-100 stat-card">
+                    <div class="card-body text-center">
+                        <div class="stat-icon-sm bg-secondary bg-opacity-10 text-secondary mx-auto mb-2">
+                            <i class="bi bi-building fs-4"></i>
+                        </div>
+                        <h6 class="text-muted mb-1 small">الكليات</h6>
+                        <h4 class="mb-0 fw-bold">{{ total_faculties }}</h4>
+                    </div>
+                </div>
+            </div>
+            <!-- Total Users -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card border-0 shadow-sm h-100 stat-card">
+                    <div class="card-body text-center">
+                        <div class="stat-icon-sm bg-dark bg-opacity-10 text-dark mx-auto mb-2">
+                            <i class="bi bi-person-gear fs-4"></i>
+                        </div>
+                        <h6 class="text-muted mb-1 small">المستخدمين</h6>
+                        <h4 class="mb-0 fw-bold">{{ total_users }}</h4>
+                    </div>
+                </div>
+            </div>
+            <!-- Upload Errors -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card border-0 shadow-sm h-100 stat-card">
+                    <div class="card-body text-center">
+                        <div class="stat-icon-sm bg-danger bg-opacity-10 text-danger mx-auto mb-2">
+                            <i class="bi bi-cloud-upload fs-4"></i>
+                        </div>
+                        <h6 class="text-muted mb-1 small">أخطاء الرفع</h6>
+                        <h4 class="mb-0 fw-bold text-danger">{{ upload_errors }}</h4>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- Scope Info (Employee) -->
+        {% if user_role == "employee" %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card border-0 shadow-sm h-100 stat-card border-start border-4 border-warning">
+                    <div class="card-body text-center">
+                        <div class="stat-icon-sm bg-warning bg-opacity-10 text-warning mx-auto mb-2">
+                            <i class="bi bi-building fs-4"></i>
+                        </div>
+                        <h6 class="text-muted mb-1 small">الكلية</h6>
+                        <h6 class="mb-0 fw-bold text-truncate"
+                            title="{{ selected_faculty_name }}">{{ selected_faculty_name|default:"--" }}</h6>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <!-- ===== Role-Specific Sections ===== -->
+    <div class="row g-3 mb-4">
+        <!-- FACULTY BREAKDOWN (Director / Supervisor) -->
+        {% if faculty_breakdown %}
+            <div class="col-12 col-lg-5">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2 text-primary"></i>توزيع الخريجين بالكليات</h5>
+                        <span class="badge bg-primary">{{ total_faculties }} كلية</span>
+                    </div>
+                    <div class="card-body">
+                        {% for item in faculty_breakdown %}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-grow-1 me-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-semibold small">{{ item.name }}</span>
+                                        <span class="text-muted small">{{ item.count }}</span>
+                                    </div>
+                                    <div class="progress progress-md">
+                                        <div class="progress-bar progress-bar-dynamic bg-primary"
+                                             style="--pct: {{ item.pct }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-1"></i>
+                                <p class="mt-2">لا توجد بيانات</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- RECENT TRANSACTIONS (Director / Supervisor) -->
+        {% if recent_transactions %}
+            <div class="col-12 col-lg-7">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header border-bottom">
+                        <h5 class="mb-0"><i class="bi bi-clock-history me-2 text-info"></i>آخر العمليات</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table">
+                                    <tr>
+                                        <th class="border-0">#</th>
+                                        <th class="border-0">الوصف</th>
+                                        <th class="border-0">التاريخ</th>
+                                        <th class="border-0">الكلية</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tx in recent_transactions %}
+                                        <tr>
+                                            <td><span class="badge bg-secondary">{{ tx.transaction_id }}</span></td>
+                                            <td class="fw-semibold">{{ tx.transaction_descripsion }}</td>
+                                            <td><small class="text-muted">{{ tx.transaction_date|date:"Y-m-d H:i" }}</small></td>
+                                            <td><span class="badge bg-light text-dark">{{ tx.faculty_id }}</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- AUDIT TRAIL (Auditor) -->
+        {% if recent_history %}
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-shield-check me-2 text-warning"></i>سجل التعديلات الأخير</h5>
+                        {% if unchecked_graduates is not None %}
+                            <span class="badge bg-warning text-dark">{{ unchecked_graduates }} خريج غير مدقق</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table">
+                                    <tr>
+                                        <th class="border-0">#</th>
+                                        <th class="border-0">الحقل</th>
+                                        <th class="border-0">القيمة القديمة</th>
+                                        <th class="border-0">القيمة الجديدة</th>
+                                        <th class="border-0">النوع</th>
+                                        <th class="border-0">التاريخ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for h in recent_history %}
+                                        <tr>
+                                            <td><span class="badge bg-secondary">{{ h.history_id }}</span></td>
+                                            <td class="fw-semibold">{{ h.history_field|default:"--" }}</td>
+                                            <td><span class="text-danger">{{ h.history_old|default:"--"|truncatechars:30 }}</span></td>
+                                            <td><span class="text-success">{{ h.history_new|default:"--"|truncatechars:30 }}</span></td>
+                                            <td><span class="badge bg-info">{{ h.history_type|default:"--" }}</span></td>
+                                            <td><small class="text-muted">{{ h.history_date|date:"Y-m-d H:i"|default:"--" }}</small></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    <!-- ===== Recent Graduates & Certificates ===== -->
+    <div class="row g-3">
+        <!-- Recent Graduates -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>آخر الخريجين</h5>
+                    <a href="#" class="btn btn-sm btn-outline-primary">عرض الكل</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table">
+                                <tr>
+                                    <th class="border-0">#</th>
+                                    <th class="border-0">الاسم</th>
+                                    <th class="border-0">الرقم القومي</th>
+                                    <th class="border-0">الدرجة</th>
+                                    <th class="border-0">الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for g in recent_graduates %}
+                                    <tr>
+                                        <td><span class="badge bg-light text-dark">{{ g.graduate_id }}</span></td>
+                                        <td class="fw-semibold">{{ g.graduate_ar_name|truncatechars:25 }}</td>
+                                        <td><small class="font-monospace">{{ g.graduate_id_card }}</small></td>
+                                        <td><span class="badge bg-light text-dark">{{ g.grade_name_ar|default:"--" }}</span></td>
+                                        <td>
+                                            {% if g.ischeked == "1" %}
+                                                <span class="badge bg-success">مدقق</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">قيد المراجعة</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                            لا يوجد خريجين مسجلين
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Recent Certificates -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-text-fill me-2 text-success"></i>آخر الشهادات</h5>
+                    <a href="#" class="btn btn-sm btn-outline-success">عرض الكل</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table">
+                                <tr>
+                                    <th class="border-0">#</th>
+                                    <th class="border-0">الرقم التسلسلي</th>
+                                    <th class="border-0">التاريخ</th>
+                                    <th class="border-0">الحالة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in recent_certificates %}
+                                    <tr>
+                                        <td><span class="badge bg-light text-dark">{{ c.certificate_id }}</span></td>
+                                        <td class="fw-semibold font-monospace">{{ c.certificate_serial }}</td>
+                                        <td><small class="text-muted">{{ c.certificate_date|date:"Y-m-d" }}</small></td>
+                                        <td>
+                                            {% if c.delivered == "1" %}
+                                                <span class="badge bg-success"><i class="bi bi-check me-1"></i>مسلّمة</span>
+                                            {% elif c.print_date %}
+                                                <span class="badge bg-info"><i class="bi bi-printer me-1"></i>مطبوعة</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass me-1"></i>قيد الانتظار</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-4">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                            لا يوجد شهادات مسجلة
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
