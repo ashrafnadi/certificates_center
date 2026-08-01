@@ -50,26 +50,24 @@
 
 ## ✨ المميزات | Features
 
-
-| الميزة | Feature        | الوصف                                                      | Description                             |
-| -------------- | ---------------- | ----------------------------------------------------------------- | ----------------------------------------- |
-| 🔐           | Authentication | نظام دخول مخصص بأدوار متعددة            | Custom login system with multiple roles |
-| 📱           | Responsive     | تصميم متجاوب يعمل على جميع الأجهزة | Fully responsive design for all devices |
-| 🌙           | Dark Mode      | دعم الوضع الليلي والنهاري                 | Light/Dark theme switcher               |
-| 🎓           | Graduates      | إدارة بيانات الخريجين                        | Graduate data management                |
-| 📄           | Certificates   | طباعة وإصدار الشهادات                        | Certificate printing & issuance         |
-| 🏛️         | Faculties      | إدارة الكليات والتخصصات                    | Faculty & specialization management     |
-| 📊           | Reports        | تقارير وإحصائيات                                 | Reports & statistics                    |
-| 📤           | Export         | تصدير البيانات إلى Excel                        | Excel data export                       |
-| 📝           | Audit Trail    | سجل العمليات والتعديلات                    | Operation & modification history        |
-| 🖨️         | PDF            | طباعة الشهادات بصيغة PDF                      | PDF certificate generation (WeasyPrint) |
+| الميزة | Feature | الوصف | Description |
+|--------|---------|-------|-------------|
+| 🔐 | Authentication | نظام دخول مخصص بأدوار متعددة | Custom login system with multiple roles |
+| 📱 | Responsive | تصميم متجاوب يعمل على جميع الأجهزة | Fully responsive design for all devices |
+| 🌙 | Dark Mode | دعم الوضع الليلي والنهاري | Light/Dark theme switcher |
+| 🎓 | Graduates | إدارة بيانات الخريجين | Graduate data management |
+| 📄 | Certificates | طباعة وإصدار الشهادات | Certificate printing & issuance |
+| 🏛️ | Faculties | إدارة الكليات والتخصصات | Faculty & specialization management |
+| 📊 | Reports | تقارير وإحصائيات | Reports & statistics |
+| 📤 | Export | تصدير البيانات إلى Excel | Excel data export |
+| 📝 | Audit Trail | سجل العمليات والتعديلات | Operation & modification history |
+| 🖨️ | PDF | طباعة الشهادات بصيغة PDF | PDF certificate generation (WeasyPrint) |
 
 ---
 
 ## 🛠️ التقنيات المستخدمة | Tech Stack
 
 ### Backend
-
 - **Django 6.0.7** — Web framework
 - **Python 3.12+** — Programming language
 - **PostgreSQL** — Primary database (production)
@@ -78,14 +76,12 @@
 - **WhiteNoise** — Static files serving (production)
 
 ### Frontend
-
 - **Bootstrap 5.3** — CSS framework (RTL support)
 - **Django Crispy Forms** — Form rendering
 - **Django HTMX** — Dynamic UI updates
 - **Bootstrap Icons** — Icon library
 
 ### Tools & Libraries
-
 - **WeasyPrint** — PDF generation
 - **openpyxl** — Excel export
 - **python-decouple** — Environment configuration
@@ -98,33 +94,27 @@
 ## 📦 متطلبات التشغيل | Requirements
 
 ### Python & Tools
-
 - Python 3.12 أو أعلى
 - Git
 
 ### Database
-
 - PostgreSQL 14+ (للإنتاج)
 - SQLite (للتطوير — مدمج مع Python)
 
 ### متطلبات نظام WeasyPrint | WeasyPrint System Dependencies
-
 > **⚠️ مهم:** WeasyPrint يحتاج مكتبات نظام لتوليد PDF. قبل التثبيت، تأكد من تثبيت:
 
 **Ubuntu / Debian:**
-
 ```bash
 sudo apt-get install -y libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0 libffi-dev libjpeg-dev libopenjp2-7-dev
 ```
 
 **macOS:**
-
 ```bash
 brew install pango libffi
 ```
 
 **Windows:**
-
 > قم بتثبيت [GTK3 for Windows](https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases) أولاً.
 
 ---
@@ -173,9 +163,8 @@ DB_HOST=localhost
 DB_PORT=5432
 ```
 
-> **⚠️ تحذير:** لا تستخدم `DEBUG=True` في بيئة الإنتاج!
+> **⚠️ تحذير:** لا تستخدم `DEBUG=True` في بيئة الإنتاج!  
 > **🛡️ أمان:** أضف `.env` إلى ملف `.gitignore` لعدم رفعه:
->
 > ```bash
 > echo ".env" >> .gitignore
 > ```
@@ -194,7 +183,7 @@ python manage.py migrate
 
 ### 6. إنشاء مستخدم مدير Django | Create Django admin user
 
-> **ملاحظة:** هذا يُنشئ مستخدمًا للوصول إلى لوحة تحكم Django Admin فقط.
+> **ملاحظة:** هذا يُنشئ مستخدمًا للوصول إلى لوحة تحكم Django Admin فقط.  
 > **مستخدمي التطبيق** (المدير، المشرف، المدقق، الموظف) يُدخلون عبر نموذج `users_profile` في قاعدة البيانات.
 
 ```bash
@@ -233,17 +222,16 @@ gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 4
 
 ## 🔧 متغيرات البيئة | Environment Variables
 
-
-| المتغير  | الوصف                                      | الافتراضي | مطلوب |
-| ----------------- | ------------------------------------------------- | -------------------- | ------------ |
-| `SECRET_KEY`    | مفتاح التشفير السري            | —                 | ✅ نعم  |
-| `DEBUG`         | وضع التصحيح                           | `False`            | ❌ لا    |
-| `ALLOWED_HOSTS` | النطاقات المسموحة               | `*`                | ❌ لا    |
-| `DB_NAME`       | اسم قاعدة البيانات              | —                 | ❌ لا    |
-| `DB_USER`       | مستخدم قاعدة البيانات        | —                 | ❌ لا    |
-| `DB_PASSWORD`   | كلمة مرور قاعدة البيانات   | —                 | ❌ لا    |
-| `DB_HOST`       | عنوان خادم قاعدة البيانات | `localhost`        | ❌ لا    |
-| `DB_PORT`       | منفذ الاتصال                         | `5432`             | ❌ لا    |
+| المتغير | الوصف | الافتراضي | مطلوب |
+|---------|-------|-----------|-------|
+| `SECRET_KEY` | مفتاح التشفير السري | — | ✅ نعم |
+| `DEBUG` | وضع التصحيح | `False` | ❌ لا |
+| `ALLOWED_HOSTS` | النطاقات المسموحة | `*` | ❌ لا |
+| `DB_NAME` | اسم قاعدة البيانات | — | ❌ لا |
+| `DB_USER` | مستخدم قاعدة البيانات | — | ❌ لا |
+| `DB_PASSWORD` | كلمة مرور قاعدة البيانات | — | ❌ لا |
+| `DB_HOST` | عنوان خادم قاعدة البيانات | `localhost` | ❌ لا |
+| `DB_PORT` | منفذ الاتصال | `5432` | ❌ لا |
 
 ---
 
@@ -311,13 +299,12 @@ certificates_center/
 
 ## 👥 الأدوار والصلاحيات | Roles & Permissions
 
-
-| الدور | Role                      | الصلاحيات            | Permissions                             |
-| ------------ | --------------------------- | ------------------------------- | ----------------------------------------- |
-| 🦸‍♂️   | **مدير** (Director)   | صلاحيات كاملة     | Full access                             |
-| 👮‍♂️   | **مشرف** (Supervisor) | إدارة ومراقبة     | Management & monitoring                 |
-| 🔍         | **مدقق** (Auditor)    | مراجعة البيانات | Data auditing (requires faculty)        |
-| 👨‍💼     | **موظف** (Employee)   | إدخال وتحديث       | Data entry & updates (requires faculty) |
+| الدور | Role | الصلاحيات | Permissions |
+|-------|------|-----------|-------------|
+| 🦸‍♂️ | **مدير** (Director) | صلاحيات كاملة | Full access |
+| 👮‍♂️ | **مشرف** (Supervisor) | إدارة ومراقبة | Management & monitoring |
+| 🔍 | **مدقق** (Auditor) | مراجعة البيانات | Data auditing (requires faculty) |
+| 👨‍💼 | **موظف** (Employee) | إدخال وتحديث | Data entry & updates (requires faculty) |
 
 > **ملاحظة:** المدققون والموظفون ملزمون باختيار الكلية عند تسجيل الدخول.
 
@@ -326,18 +313,15 @@ certificates_center/
 ## 📖 الاستخدام | Usage
 
 ### تسجيل الدخول
-
 1. افتح `/login/`
 2. أدخل اسم المستخدم وكلمة المرور
 3. اختر الكلية (إذا كان الدور يتطلب ذلك)
 4. اضغط "تسجيل الدخول"
 
 ### تبديل المظهر
-
 - اضغط على أيقونة 🌙/☀️ في الشريط العلوي للتبديل بين الوضع الليلي والنهاري.
 
 ### إخفاء/إظهار القائمة
-
 - **الجوال:** اضغط على ☰ لفتح/إغلاق القائمة الجانبية.
 - **سطح المكتب:** اضغط على ☰ لطي/توسيع القائمة.
 
@@ -347,10 +331,75 @@ certificates_center/
 
 > *سيتم إضافة لقطات الشاشة قريبًا...*
 
-
 | صفحة الدخول | لوحة التحكم | إدارة الخريجين |
-| ----------------------- | ----------------------- | ----------------------------- |
-| 🖼️ Login            | 🖼️ Dashboard        | 🖼️ Graduates              |
+|-------------|-------------|----------------|
+| 🖼️ Login | 🖼️ Dashboard | 🖼️ Graduates |
+
+---
+
+## 📸 صور الخريجين | Graduate Photos
+
+> **ملاحظة هامة:** يتم تخزين صور الخريجين كملفات منفصلة وليس في قاعدة البيانات.
+
+### مواصفات الصور
+
+| البند | التفاصيل |
+|-------|----------|
+| **المسار** | `uploads/graduates_photos/` |
+| **اسم الملف** | `{{ graduate_id }}` (مثال: `12345.jpg`) |
+| **الامتدادات المدعومة** | `.jpg` · `.jpeg` · `.png` |
+| **الحجم الموصى به** | 300×400 بكسل (بطاقة شخصية) |
+
+### عرض الصورة في القالب
+
+```html
+{% load static %}
+<img src="/uploads/graduates_photos/{{ g.graduate_id }}.jpg"
+     onerror="this.src='{% static "images/default-avatar.png" %}'"
+     alt="{{ g.graduate_ar_name }}"
+     class="rounded-circle"
+     width="64" height="64">
+```
+
+> **ملاحظة:** استخدم `onerror` لعرض صورة افتراضية إذا لم تكن صورة الخريج موجودة.
+
+### إعدادات MEDIA في `settings.py`
+
+```python
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_URL = "/uploads/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
+```
+
+### إضافة مسار الملفات المرفوعة في `urls.py`
+
+```python
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    # ... your existing urls
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+```
+
+### هيكل المجلدات
+
+```
+certificates_center/
+├── uploads/
+│   └── graduates_photos/
+│       ├── 10001.jpg
+│       ├── 10002.png
+│       ├── 10003.jpeg
+│       └── ...
+```
 
 ---
 
@@ -368,14 +417,15 @@ certificates_center/
 
 ## 📄 الترخيص | License
 
-هذا المشروع مرخص بموجب **MIT License**.
+هذا المشروع مرخص بموجب **MIT License**.  
 يرجى إضافة ملف `LICENSE` إلى المستودع للاطلاع على النص الكامل.
 
 ---
 
 ## 📞 التواصل | Contact
 
-**شركة بداية لتسويق خدمات جامعة بنها**Bidaya Company for Marketing Banha University Services
+**شركة بداية لتسويق خدمات جامعة بنها**  
+Bidaya Company for Marketing Banha University Services
 
 - 📧 البريد الإلكتروني: *(لم يُحدد)*
 - 🌐 الموقع: *(لم يُحدد)*

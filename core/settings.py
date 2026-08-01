@@ -1,5 +1,6 @@
 import json
 from decimal import Decimal
+import os
 from pathlib import Path
 
 from decouple import Csv, config
@@ -140,8 +141,8 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/uploads/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 
 BACKUP_ROOT = BASE_DIR / "backups"
 
