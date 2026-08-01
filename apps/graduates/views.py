@@ -122,7 +122,11 @@ def index(request):
         breakdown = []
         all_grad_count = graduate.objects.count() or 1  # avoid div by zero
         for f in faculty.objects.all().order_by("faculty_ar_name"):
-            count = graduate.objects.filter(faculty_id=f.faculty_id).exclude(ischeked="N", ischeked2="N").count()
+            count = (
+                graduate.objects.filter(faculty_id=f.faculty_id)
+                .exclude(ischeked="N", ischeked2="N")
+                .count()
+            )
             if count > 0:
                 breakdown.append(
                     {
@@ -141,7 +145,9 @@ def index(request):
     # ═══════════════════════════════════════════════════
     if role == "auditor" or is_admin or is_superuser:
         context["unchecked_graduates"] = (
-            graduate.objects.filter(**grad_filter).exclude(ischeked="Y",ischeked2="Y").count()
+            graduate.objects.filter(**grad_filter)
+            .exclude(ischeked="Y", ischeked2="Y")
+            .count()
         )
 
         hist_filter = {}
