@@ -193,6 +193,7 @@
                                         <th class="border-0">الوصف</th>
                                         <th class="border-0">التاريخ</th>
                                         <th class="border-0">الكلية</th>
+                                        <th>عدد الطلاب</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -202,6 +203,7 @@
                                             <td class="fw-semibold">{{ tx.transaction_descripsion }}</td>
                                             <td><small class="text-muted">{{ tx.transaction_date|date:"Y-m-d H:i" }}</small></td>
                                             <td><span class="badge bg-light text-dark">{{ tx.faculty_id }}</span></td>
+                                            <td><span class="badge bg-light text-dark">{{ tx.graduate_count }}</span></td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -260,7 +262,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>آخر الخريجين</h5>
-                    <a href="#" class="btn btn-sm btn-outline-primary">عرض الكل</a>
+                    {% comment %} <a href="#" class="btn btn-sm btn-outline-primary">عرض الكل</a> {% endcomment %}
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -278,12 +280,12 @@
                             <tbody>
                                 {% for g in recent_graduates %}
                                     <tr>
-                                        <td><span class="badge bg-light text-dark">{{ g.graduate_id }}</span></td>
-                                        <td class="fw-semibold">{{ g.graduate_ar_name|truncatechars:25 }}</td>
-                                        <td><small class="font-monospace">{{ g.graduate_id_card }}</small></td>
-                                        <td><span class="badge bg-light text-dark">{{ g.grade_name_ar|default:"--" }}</span></td>
-                                        <td><span class="badge bg-light text-dark">{{ g.faculty_name_ar|default:"--" }}</span></td>
-                                        <td>
+                                        <td><span class="badge bg-light text-dark fs-6">{{ g.graduate_id }}</span></td>
+                                        <td class="fw-semibold fs-6">{{ g.graduate_ar_name }}</td>
+                                        <td><small class="font-monospace  fs-6">{{ g.graduate_id_card }}</small></td>
+                                        <td><span class="badge bg-light text-dark  fs-6">{{ g.grade_name_ar|default:"ساعات معتمدة" }}</span></td>
+                                        <td><span class="badge bg-light text-dark fs-6">{{ g.faculty|default:"--" }}</span></td>
+                                        <td class="fs-6">
                                             {% if g.ischeked == "1" %}
                                                 <span class="badge bg-success">مدقق</span>
                                             {% else %}

@@ -1,3 +1,4 @@
+from django.db.models.aggregates import Count
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from apps.administration.models import (
@@ -6,7 +7,7 @@ from apps.administration.models import (
     Upload_Error,
     Transaction,
 )
-from apps.graduates.models import Graduate, Certificate,History
+from apps.graduates.models import Graduate, Certificate, History
 
 
 @login_required
@@ -100,10 +101,10 @@ def index(request):
         "pending_pct": pending_pct,
         "deliver_pct": deliver_pct,
         # Recent lists
-        "recent_graduates": Graduate.objects.filter(**grad_filter).order_by(
-            "-graduate_id"
-        )[:6],
-        "recent_certificates": cert_qs.order_by("-certificate_date")[:5],
+        "recent_graduates": Graduate.objects.filter(**grad_filter)
+        .select_related("faculty")
+        .order_by("-graduate_id")[:8],
+        "recent_certificates": cert_qs.order_by("-certificate_date")[:8],
     }
 
     # ═══════════════════════════════════════════════════
@@ -113,9 +114,12 @@ def index(request):
         context["total_faculties"] = Faculty.objects.count()
         context["total_users"] = Users_Profile.objects.count()
         context["upload_errors"] = Upload_Error.objects.count()
-        context["recent_transactions"] = Transaction.objects.order_by(
-            "-transaction_date"
-        )[:5]
+        context["recent_transactions"] = (
+            Transaction.objects.annotate(graduate_count=Count("graduate"))
+            .filter(graduate_count__gt=0)
+            .select_related("faculty_id")
+            .order_by("-transaction_date")[:8]
+        )
 
         # Faculty breakdown with percentages
         breakdown = []
