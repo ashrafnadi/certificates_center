@@ -1,5 +1,12 @@
 from django.db import models
-from apps.administration.models import Faculty, Authenticated_User
+from apps.administration.models import (
+    Faculty,
+    Authenticated_User,
+    Nationality,
+    Specialization,
+    Regulation,
+    Transaction,
+)
 
 
 class Certificate(models.Model):
@@ -49,7 +56,7 @@ class Graduate(models.Model):
     graduate_en_pob = models.CharField(max_length=100)
     graduate_dob = models.DateTimeField()
     nationality = models.ForeignKey(
-        "administration.Nationality", on_delete=models.CASCADE, blank=True, null=True
+        Nationality, on_delete=models.CASCADE, blank=True, null=True
     )
     graduate_gendar = models.SmallIntegerField()
     graduate_notes = models.CharField(max_length=200, blank=True, null=True)
@@ -63,17 +70,17 @@ class Graduate(models.Model):
     ischeked = models.CharField(max_length=2)
     ischeked2 = models.CharField(max_length=20)
     specialization = models.ForeignKey(
-        "administration.Specialization", on_delete=models.CASCADE, blank=True, null=True
+        Specialization, on_delete=models.CASCADE, blank=True, null=True
     )
     faculty_turn = models.ForeignKey(
-        "Faculty_Turn", on_delete=models.CASCADE, blank=True, null=True
+        Faculty_Turn, on_delete=models.CASCADE, blank=True, null=True
     )
     regulation = models.ForeignKey(
-        "administration.Regulation", on_delete=models.CASCADE, blank=True, null=True
+        Regulation, on_delete=models.CASCADE, blank=True, null=True
     )
     isdelete = models.CharField(max_length=2, blank=True, null=True)
     transaction = models.ForeignKey(
-        "administration.Transaction", on_delete=models.CASCADE, blank=True, null=True
+        Transaction, on_delete=models.CASCADE, blank=True, null=True
     )
     lastuser = models.BigIntegerField()
     transdesciption = models.CharField(max_length=200)
