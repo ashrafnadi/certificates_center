@@ -135,7 +135,7 @@
     transition: margin-right var(--transition-speed) ease;
 }
 
-.sidebar.collapsed ~ .main-content {
+.sidebar.collapsed~.main-content {
     margin-right: var(--sidebar-collapsed-width);
 }
 
@@ -461,4 +461,35 @@
     .quick-action-card {
         padding: 1rem 0.25rem;
     }
+}
+
+/* ============================================
+   GRADUATE LIST ADDITIONS
+   ============================================ */
+
+.bg-pink {
+    background-color: #e83e8c !important;
+}
+
+/* Photo card styling */
+.graduate-photo {
+    width: 180px;
+    height: 220px;
+    object-fit: cover;
+    border: 3px solid var(--bs-primary);
+    border-radius: 12px;
+}
+
+/* Table row hover enhancement */
+.table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+/* Loading spinner centering */
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request .htmx-indicator {
+    display: block;
 }

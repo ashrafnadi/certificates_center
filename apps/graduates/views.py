@@ -1,13 +1,16 @@
-from django.db.models import Count, Q
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, render
+
 from apps.administration.models import (
-    Users_Profile,
     Faculty,
-    Upload_Error,
+    Section,
+    Specialization,
     Transaction,
+    Upload_Error,
+    Users_Profile,
 )
-from apps.graduates.models import Graduate, Certificate, History
+from apps.graduates.models import Certificate, Graduate, History
 
 
 @login_required
@@ -152,7 +155,9 @@ def index(request):
         context["unchecked_graduates"] = base_grad_qs.filter(
             Q(ischeked="N") & Q(ischeked2="N")
         ).count()
-        context["unchecked_graduates_supervisor"] = base_grad_qs.filter(Q(ischeked="Y") & Q(ischeked2="N")).count()
+        context["unchecked_graduates_supervisor"] = base_grad_qs.filter(
+            Q(ischeked="Y") & Q(ischeked2="N")
+        ).count()
 
         hist_filter = {}
         if role == "employee" and selected_faculty_id:
@@ -162,3 +167,111 @@ def index(request):
         )[:5]
 
     return render(request, "graduates/index.html", context)
+
+
+@login_required
+def graduate_list(request):
+    """
+    Graduate list view with role-based filtering:
+    - Director/Supervisor/Superuser: All faculties → sections → specializations → graduates
+    - Auditor: Login faculty only, ischeked='N', must select section → specialization
+    - Employee: Login faculty only, must select section → specialization
+    """
+    user = request.user
+    role = request.session.get("user_role") or getattr(user, "role", "employee")
+    is_admin = request.session.get("user_is_admin", False)
+    is_superuser = getattr(user, "is_staff", False)
+
+    selected_faculty_id = request.session.get("selected_faculty_id")
+    selected_faculty_name = request.session.get("selected_faculty_name", "")
+
+    # ── Determine scope ──
+    is_director = role in ("director", "supervisor") or is_admin or is_superuser
+
+    # Faculties list (only for directors/supervisors/superusers)
+    faculties = Faculty.objects.all().order_by("faculty_ar_name") if is_director else []
+
+    # GET parameters
+    faculty_id = request.GET.get("faculty_id")
+    section_id = request.GET.get("section_id")
+    specialization_id = request.GET.get("specialization_id")
+    graduate_id = request.GET.get("graduate_id")
+
+    # ── Faculty filter ──
+    if is_director and faculty_id:
+        current_faculty = get_object_or_404(Faculty, pk=faculty_id)
+    elif not is_director and selected_faculty_id:
+        current_faculty = get_object_or_404(Faculty, pk=selected_faculty_id)
+        faculty_id = selected_faculty_id
+    else:
+        current_faculty = None
+
+    # ── Sections list ──
+    sections = []
+    if current_faculty:
+        sections = Section.objects.filter(faculty=current_faculty).order_by(
+            "section_ar_namr"
+        )
+
+    # ── Specializations list ──
+    specializations = []
+    if section_id:
+        specializations = Specialization.objects.filter(section_id=section_id).order_by(
+            "specialization_ar_name"
+        )
+
+    # ── Graduates queryset ──
+    graduates = Graduate.objects.none()
+    if current_faculty and specialization_id:
+        graduates = Graduate.objects.filter(
+            faculty=current_faculty,
+            specialization_id=specialization_id,
+        )
+
+        # Auditor: only unchecked graduates
+        if role == "auditor":
+            graduates = graduates.filter(ischeked="N")
+
+        graduates = graduates.select_related(
+            "nationality", "faculty", "specialization"
+        ).order_by("-graduate_id")
+
+    # ── Graduate detail ──
+    selected_graduate = None
+    certificates = []
+    if graduate_id:
+        selected_graduate = get_object_or_404(
+            Graduate.objects.select_related(
+                "nationality", "faculty", "specialization", "faculty_turn", "regulation"
+            ),
+            graduate_id=graduate_id,
+        )
+        certificates = Certificate.objects.filter(graduate_id=graduate_id).order_by(
+            "-certificate_date"
+        )
+
+    context = {
+        "user_role": role,
+        "is_director": is_director,
+        "faculties": faculties,
+        "sections": sections,
+        "specializations": specializations,
+        "graduates": graduates,
+        "selected_faculty": current_faculty,
+        "selected_faculty_name": selected_faculty_name,
+        "selected_section_id": section_id,
+        "selected_specialization_id": specialization_id,
+        "selected_graduate": selected_graduate,
+        "certificates": certificates,
+    }
+
+    # HTMX partial rendering
+    if request.headers.get("HX-Request"):
+        if "section_id" in request.GET and "specialization_id" not in request.GET:
+            return render(request, "graduates/partials/specializations.html", context)
+        elif "specialization_id" in request.GET and "graduate_id" not in request.GET:
+            return render(request, "graduates/partials/graduates_table.html", context)
+        elif "graduate_id" in request.GET:
+            return render(request, "graduates/partials/graduate_detail.html", context)
+
+    return render(request, "graduates/graduate_list.html", context)

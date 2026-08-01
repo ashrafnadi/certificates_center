@@ -90,7 +90,7 @@ class Section(models.Model):
     section_id = models.BigIntegerField(primary_key=True)
     section_ar_namr = models.CharField(max_length=400)
     section_en_name = models.CharField(max_length=400, blank=True, null=True)
-    faculty_id = models.ForeignKey(
+    faculty = models.ForeignKey(
         Faculty, on_delete=models.CASCADE, blank=True, null=True
     )
 
@@ -105,7 +105,7 @@ class Specialization(models.Model):
     specialization_id = models.BigIntegerField(primary_key=True)
     specialization_ar_name = models.CharField(max_length=400)
     specialization_en_name = models.CharField(max_length=400)
-    section_id = models.ForeignKey(
+    section = models.ForeignKey(
         Section, on_delete=models.CASCADE, blank=True, null=True
     )
     total_score = models.IntegerField(blank=True, null=True)

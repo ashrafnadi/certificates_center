@@ -14,7 +14,7 @@ class Certificate(models.Model):
     certificate_serial = models.CharField(max_length=20)
     certificate_date = models.DateTimeField()
     certificate_status = models.CharField(max_length=2)
-    graduate_id = models.BigIntegerField(blank=True, null=True)
+    graduate = models.ForeignKey("Graduate", on_delete=models.CASCADE, blank=True, null=True)
     print_date = models.DateTimeField(blank=True, null=True)
     delivered = models.CharField(max_length=2, blank=True, null=True)
     delivered_date = models.DateTimeField(blank=True, null=True)
@@ -29,7 +29,7 @@ class Certificate(models.Model):
 
 class Faculty_Turn(models.Model):
     faculty_turn_id = models.BigIntegerField(primary_key=True)
-    faculty_id = models.ForeignKey(
+    faculty = models.ForeignKey(
         Faculty, on_delete=models.CASCADE, blank=True, null=True
     )
     turn_ar_name = models.CharField(max_length=30)
@@ -98,8 +98,8 @@ class Graduate(models.Model):
 
 class History(models.Model):
     history_id = models.DecimalField(primary_key=True, max_digits=20, decimal_places=0)
-    row_id = models.ForeignKey(
-        Graduate, on_delete=models.CASCADE, blank=True, null=True
+    graduate = models.ForeignKey(
+        "Graduate", on_delete=models.CASCADE, blank=False, null=False
     )
     history_date = models.DateTimeField(blank=True, null=True)
     history_field = models.CharField(max_length=400, blank=True, null=True)
