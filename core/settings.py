@@ -1,6 +1,6 @@
 import json
-from decimal import Decimal
 import os
+from decimal import Decimal
 from pathlib import Path
 
 from decouple import Csv, config
