@@ -73,7 +73,7 @@
     {% endif %}
     <!-- ===== Core KPI Cards (All Roles) ===== -->
     <div class="row g-3 mb-4">
-        <div class="col-6 col-lg-3">
+        <div class="col-6 col-lg-4">
             <div class="card border-0 shadow-sm h-100 stat-card">
                 <div class="card-body text-center">
                     <div class="stat-icon-sm bg-primary bg-opacity-10 text-primary mx-auto mb-2">
@@ -88,21 +88,32 @@
         </div>
         {% if user_role == "auditor" or user.is_staff %}
             <!-- Unchecked Graduates (Auditor) -->
-            <div class="col-6 col-md-4 col-lg-3">
+            <div class="col-6 col-md-4 col-lg-2">
                 <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="stat-icon-sm bg-danger bg-opacity-10 text-danger mx-auto mb-2">
                             <i class="bi bi-exclamation-triangle fs-4"></i>
                         </div>
-                        <h6 class="text-muted mb-1 small">غير مدقق</h6>
+                        <h6 class="text-muted mb-1 small">جديد وغير مدقق</h6>
                         <h4 class="mb-0 fw-bold text-danger">{{ unchecked_graduates }}</h4>
                     </div>
                 </div>
-            </div>
+            </div>  
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card border-0 shadow-sm h-100 stat-card">
+                    <div class="card-body text-center">
+                        <div class="stat-icon-sm bg-danger bg-opacity-10 text-danger mx-auto mb-2">
+                            <i class="bi bi-exclamation-triangle fs-4"></i>
+                        </div>
+                        <h6 class="text-muted mb-1 small">غير مدقق من المشرف</h6>
+                        <h4 class="mb-0 fw-bold text-danger">{{ unchecked_graduates_supervisor }}</h4>
+                    </div>
+                </div>
+            </div>  
         {% endif %}
         {% if user_role == "director" or user_role == "supervisor" or user.is_staff %}
             <!-- Total Faculties -->
-            <div class="col-6 col-md-4 col-lg-3">
+            <div class="col-6 col-md-4 col-lg-2">
                 <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="stat-icon-sm bg-secondary bg-opacity-10 text-secondary mx-auto mb-2">
@@ -114,10 +125,10 @@
                 </div>
             </div>
             <!-- Total Users -->
-            <div class="col-6 col-md-4 col-lg-3">
+            <div class="col-6 col-md-4 col-lg-2">
                 <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
-                        <div class="stat-icon-sm bg-dark bg-opacity-10 text-dark mx-auto mb-2">
+                        <div class="stat-icon-sm bg-info bg-opacity-10 text-info mx-auto mb-2">
                             <i class="bi bi-person-gear fs-4"></i>
                         </div>
                         <h6 class="text-muted mb-1 small">المستخدمين</h6>

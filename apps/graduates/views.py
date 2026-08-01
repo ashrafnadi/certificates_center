@@ -150,8 +150,9 @@ def index(request):
     # ═══════════════════════════════════════════════════════════════
     if role == "auditor" or is_admin or is_superuser:
         context["unchecked_graduates"] = base_grad_qs.filter(
-            Q(ischeked="N") | Q(ischeked2="N")
+            Q(ischeked="N") & Q(ischeked2="N")
         ).count()
+        context["unchecked_graduates_supervisor"] = base_grad_qs.filter(Q(ischeked="Y") & Q(ischeked2="N")).count()
 
         hist_filter = {}
         if role == "employee" and selected_faculty_id:
