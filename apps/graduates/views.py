@@ -216,7 +216,7 @@ def graduate_list(request):
     # ── Specializations list ──
     specializations = []
     if section_id:
-        specializations = Specialization.objects.filter(section_id=section_id).order_by(
+        specializations = Specialization.objects.filter(section=section_id).order_by(
             "specialization_ar_name"
         )
 
@@ -225,7 +225,7 @@ def graduate_list(request):
     if current_faculty and specialization_id:
         graduates = Graduate.objects.filter(
             faculty=current_faculty,
-            specialization_id=specialization_id,
+            specialization=specialization_id,
         )
 
         # Auditor: only unchecked graduates
@@ -238,16 +238,12 @@ def graduate_list(request):
 
     # ── Graduate detail ──
     selected_graduate = None
-    certificates = []
     if graduate_id:
         selected_graduate = get_object_or_404(
             Graduate.objects.select_related(
                 "nationality", "faculty", "specialization", "faculty_turn", "regulation"
             ),
             graduate_id=graduate_id,
-        )
-        certificates = Certificate.objects.filter(graduate_id=graduate_id).order_by(
-            "-certificate_date"
         )
 
     context = {
@@ -262,7 +258,6 @@ def graduate_list(request):
         "selected_section_id": section_id,
         "selected_specialization_id": specialization_id,
         "selected_graduate": selected_graduate,
-        "certificates": certificates,
     }
 
     # HTMX partial rendering
