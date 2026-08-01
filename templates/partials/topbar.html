@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand fixed-top navbar-dark bg-primary shadow-sm"
+     id="topbar">
+    <div class="container-fluid px-3">
+        <!-- Sidebar Toggle (Mobile) -->
+        <button class="btn btn-link text-white p-1 d-lg-none"
+                id="sidebarToggle"
+                type="button"
+                aria-label="القائمة">
+            <i class="bi bi-list fs-4"></i>
+        </button>
+        <!-- Project Name/Logo -->
+        <a class="navbar-brand d-flex align-items-center gap-2 me-auto ms-2"
+           href="{% url 'graduates:index' %}">
+            <i class="bi bi-mortarboard-fill fs-5"></i>
+            <span class="fw-bold d-none d-sm-inline">{{ APPLICATION_NAME }}</span>
+            <span class="fw-bold d-sm-none">{{ APPLICATION_SLUG }}</span>
+        </a>
+        <!-- Right Actions -->
+        <div class="d-flex align-items-center gap-1">
+            <!-- Theme Toggle -->
+            <button class="btn btn-link text-white p-2"
+                    id="themeToggle"
+                    type="button"
+                    title="تبديل المظهر">
+                <i class="bi bi-moon-fill" id="themeIcon"></i>
+            </button>
+            <!-- Logout -->
+            <a href="{% url 'administration:logout' %}"
+               class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-box-arrow-left"></i>
+                <span class="d-none d-md-inline">خروج</span>
+            </a>
+        </div>
+    </div>
+</nav>

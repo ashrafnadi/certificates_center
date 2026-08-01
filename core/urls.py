@@ -10,7 +10,7 @@ if settings.DEBUG:
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("graduates/", include("apps.graduates.urls")),
+    path("graduate/", include("apps.graduate.urls")),
     path("", include("apps.administration.urls")),
 ]
 if settings.DEBUG:

@@ -1,0 +1,15 @@
+{% if request.user.is_admin %}
+    {% include 'partials/admin_side_menu.html' %}
+{% elif request.user.profile.is_supervisor %}
+    {% include 'partials/supervisor_side_menu.html' %}
+{% elif request.user.profile.is_director %}
+    {% include 'partials/director_side_menu.html' %}
+{% elif request.user.profile.is_auditor %}
+    {% include 'partials/auditor_side_menu.html' %}
+{% elif request.user.profile.is_employee %}
+    {% include 'partials/employee_side_menu.html' %}
+{% else %}
+    <div>
+        <p class="text-center">No menu available for your role.</p>
+    </div>
+{% endif %}

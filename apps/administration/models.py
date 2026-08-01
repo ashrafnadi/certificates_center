@@ -93,7 +93,7 @@ class faculty(models.Model):
         ordering = ("faculty_id",)
 
     def __str__(self):
-        return str(self.faculty_id)
+        return str(self.faculty_ar_name)
 
 
 class history(models.Model):
