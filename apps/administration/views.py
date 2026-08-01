@@ -23,38 +23,44 @@ def user_login(request):
             password = form.cleaned_data["password"]
             selected_faculty = form.cleaned_data["faculty"]
 
-            # ⬅️ Django يجرب كل الـ AUTHENTICATION_BACKENDS تلقائياً
             user = authenticate(request, username=username, password=password)
 
             if user is not None:
-                # التحقق من الدور والصلاحيات
+                # ── Determine role & admin status ──
                 role = getattr(user, "role", None)
-                is_admin = getattr(user, "isadmin", None)
-                is_superuser = getattr(user, "is_superuser", False) or getattr(
-                    user, "is_staff", False
+                is_admin = getattr(user, "isadmin", None) in (
+                    "1",
+                    "yes",
+                    "true",
+                    "True",
+                    "Yes",
                 )
+                is_staff = getattr(user, "is_staff", False)
 
-                # لو المستخدم من django.contrib.auth (superuser) ومش عنده profile
-                # نعتبره مشرف/مدير وما نطلبش منه كلية
-                if role is None and is_superuser:
-                    role = "supervisor"  # أو 'director' حسب رغبتك
-                    is_admin = "1"
+                # Django superuser without profile → treat as director
+                if role is None and is_staff:
+                    role = "director"
+                    is_admin = True
 
-                # المدقق والموظف ملزمين باختيار الكلية (ما عدا الـ admin / superuser)
-                faculty_required = False
-                if (
-                    role in ("auditor", "employee")
-                    and not is_admin
-                    and not is_superuser
-                ):
-                    faculty_required = True
+                # Fallback if role still None
+                if role is None:
+                    role = "employee"
+
+                # ── Faculty requirement ──
+                faculty_required = (
+                    role in ("auditor", "employee") and not is_admin and not is_staff
+                )
 
                 if faculty_required and not selected_faculty:
                     form.add_error("faculty", "يجب اختيار الكلية للمدققين والموظفين")
                 else:
                     login(request, user)
 
-                    # حفظ الكلية المختارة في الجلسة
+                    # Persist role to session for dashboard
+                    request.session["user_role"] = role
+                    request.session["user_is_admin"] = is_admin
+
+                    # Persist selected faculty
                     if selected_faculty:
                         request.session["selected_faculty_id"] = (
                             selected_faculty.faculty_id
@@ -66,7 +72,7 @@ def user_login(request):
                         request.session.pop("selected_faculty_id", None)
                         request.session.pop("selected_faculty_name", None)
 
-                    # إعادة توجيه HTMX أو عادي
+                    # HTMX redirect
                     if request.headers.get("HX-Request"):
                         response = HttpResponse()
                         response["HX-Redirect"] = "/"

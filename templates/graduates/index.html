@@ -4,7 +4,7 @@
     <!-- ===== Welcome Header ===== -->
     <div class="row g-3 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-sm bg-primary bg-gradient text-white">
+            <div class="card border-0 shadow-sm bg-gradient">
                 <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div>
                         <h4 class="mb-1 fw-bold">
@@ -32,7 +32,7 @@
         </div>
     </div>
     <!-- ===== Quick Actions (Employee Focus) ===== -->
-    {% if user_role == "employee" %}
+    {% if user_role == "employee" and not request.user.is_superuser %}
         <div class="row g-3 mt-2">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -73,12 +73,11 @@
     {% endif %}
     <!-- ===== Core KPI Cards (All Roles) ===== -->
     <div class="row g-3 mb-4">
-        <!-- Total Graduates -->
         <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 stat-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                <div class="card-body text-center">
+
+                        <div class="stat-icon-sm bg-primary bg-opacity-10 text-primary mx-auto mb-2">
                             <i class="bi bi-people fs-3"></i>
                         </div>
                         <div>
@@ -86,96 +85,11 @@
                             <h3 class="mb-0 fw-bold">{{ total_graduates }}</h3>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- Total Certificates -->
-        <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100 stat-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-info bg-opacity-10 text-info">
-                            <i class="bi bi-file-earmark-text fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted mb-1 small">الشهادات</h6>
-                            <h3 class="mb-0 fw-bold">{{ total_certificates }}</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Printed Certificates -->
-        <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100 stat-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-printer fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted mb-1 small">مطبوعة</h6>
-                            <h3 class="mb-0 fw-bold">{{ printed_certificates }}</h3>
-                        </div>
-                    </div>
-                    {% if total_certificates > 0 %}
-                        <div class="mt-2">
-                            <div class="progress progress-thin">
-                                <div class="progress-bar progress-bar-dynamic bg-success"
-                                     style="--pct: {{ print_pct }}%"></div>
-                            </div>
-                            <small class="text-muted">{{ print_pct }}% من الإجمالي</small>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        <!-- Pending Certificates -->
-        <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm h-100 stat-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
-                            <i class="bi bi-hourglass-split fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted mb-1 small">قيد الانتظار</h6>
-                            <h3 class="mb-0 fw-bold">{{ pending_certificates }}</h3>
-                        </div>
-                    </div>
-                    {% if total_certificates > 0 %}
-                        <div class="mt-2">
-                            <div class="progress progress-thin">
-                                <div class="progress-bar progress-bar-dynamic bg-warning"
-                                     style="--pct: {{ pending_pct }}%"></div>
-                            </div>
-                            <small class="text-muted">{{ pending_pct }}% غير مطبوعة</small>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ===== Secondary KPI Row ===== -->
-    <div class="row g-3 mb-4">
-        <!-- Delivered -->
-        <div class="col-6 col-md-4 col-lg-2">
-            <div class="card border-0 shadow-sm h-100 stat-card">
-                <div class="card-body text-center">
-                    <div class="stat-icon-sm bg-success bg-opacity-10 text-success mx-auto mb-2">
-                        <i class="bi bi-check-circle fs-4"></i>
-                    </div>
-                    <h6 class="text-muted mb-1 small">مسلّمة</h6>
-                    <h4 class="mb-0 fw-bold text-success">{{ delivered_certificates }}</h4>
-                    {% if total_certificates > 0 %}
-                        <small class="text-muted">{{ deliver_pct }}%</small>
-                    {% endif %}
-                </div>
             </div>
         </div>
         {% if user_role == "auditor" or user.is_staff %}
             <!-- Unchecked Graduates (Auditor) -->
-            <div class="col-6 col-md-4 col-lg-2">
+            <div class="col-6 col-md-4 col-lg-3">
                 <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="stat-icon-sm bg-danger bg-opacity-10 text-danger mx-auto mb-2">
@@ -189,7 +103,7 @@
         {% endif %}
         {% if user_role == "director" or user_role == "supervisor" or user.is_staff %}
             <!-- Total Faculties -->
-            <div class="col-6 col-md-4 col-lg-2">
+            <div class="col-6 col-md-4 col-lg-3">
                 <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="stat-icon-sm bg-secondary bg-opacity-10 text-secondary mx-auto mb-2">
@@ -201,7 +115,7 @@
                 </div>
             </div>
             <!-- Total Users -->
-            <div class="col-6 col-md-4 col-lg-2">
+            <div class="col-6 col-md-4 col-lg-3">
                 <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body text-center">
                         <div class="stat-icon-sm bg-dark bg-opacity-10 text-dark mx-auto mb-2">
@@ -212,22 +126,10 @@
                     </div>
                 </div>
             </div>
-            <!-- Upload Errors -->
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="card border-0 shadow-sm h-100 stat-card">
-                    <div class="card-body text-center">
-                        <div class="stat-icon-sm bg-danger bg-opacity-10 text-danger mx-auto mb-2">
-                            <i class="bi bi-cloud-upload fs-4"></i>
-                        </div>
-                        <h6 class="text-muted mb-1 small">أخطاء الرفع</h6>
-                        <h4 class="mb-0 fw-bold text-danger">{{ upload_errors }}</h4>
-                    </div>
-                </div>
-            </div>
         {% endif %}
         <!-- Scope Info (Employee) -->
-        {% if user_role == "employee" %}
-            <div class="col-6 col-md-4 col-lg-2">
+        {% if user_role == "employee" and not request.user.is_superuser %}
+            <div class="col-6 col-md-4 col-lg-3">
                 <div class="card border-0 shadow-sm h-100 stat-card border-start border-4 border-warning">
                     <div class="card-body text-center">
                         <div class="stat-icon-sm bg-warning bg-opacity-10 text-warning mx-auto mb-2">
@@ -248,7 +150,7 @@
             <div class="col-12 col-lg-5">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-header border-bottom d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2 text-primary"></i>توزيع الخريجين بالكليات</h5>
+                        <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2 text-primary"></i>توزيع الخريجين بالكليات وتم تدقيق بياناتهم (أعلي 8 كليات)</h5>
                         <span class="badge bg-primary">{{ total_faculties }} كلية</span>
                     </div>
                     <div class="card-body">

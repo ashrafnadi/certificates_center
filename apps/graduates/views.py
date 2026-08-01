@@ -19,11 +19,9 @@ def index(request):
     Auditors see verification-focused metrics.
     """
     user = request.user
-    role = getattr(user, "role", "employee")
-    is_admin = getattr(user, "isadmin", None) in ("1", "yes", "true", "True", "Yes")
-    is_superuser = getattr(user, "is_superuser", False) or getattr(
-        user, "is_staff", False
-    )
+    role = request.session.get("user_role") or getattr(user, "role", "employee")
+    is_admin = request.session.get("user_is_admin", False)
+    is_superuser = getattr(user, "is_staff", False)
 
     if request.user.is_superuser:
         request.user.is_admin = True
@@ -88,7 +86,9 @@ def index(request):
     # Build context
     context = {
         "user_role": role,
-        "user_role_display": dict(users_profile.ROLE_CHOICES).get(role, role),
+        "user_role_display": "مدير النظام"
+        if request.user.is_superuser
+        else dict(users_profile.ROLE_CHOICES).get(role, role),
         "scope_label": scope_label,
         "selected_faculty_name": selected_faculty_name,
         # Core KPIs
@@ -122,7 +122,7 @@ def index(request):
         breakdown = []
         all_grad_count = graduate.objects.count() or 1  # avoid div by zero
         for f in faculty.objects.all().order_by("faculty_ar_name"):
-            count = graduate.objects.filter(faculty_id=f.faculty_id).count()
+            count = graduate.objects.filter(faculty_id=f.faculty_id).exclude(ischeked="N", ischeked2="N").count()
             if count > 0:
                 breakdown.append(
                     {
@@ -141,7 +141,7 @@ def index(request):
     # ═══════════════════════════════════════════════════
     if role == "auditor" or is_admin or is_superuser:
         context["unchecked_graduates"] = (
-            graduate.objects.filter(**grad_filter).exclude(ischeked="1").count()
+            graduate.objects.filter(**grad_filter).exclude(ischeked="Y",ischeked2="Y").count()
         )
 
         hist_filter = {}
@@ -151,4 +151,4 @@ def index(request):
             "-history_date"
         )[:5]
 
-    return render(request, "graduate/index.html", context)
+    return render(request, "graduates/index.html", context)
