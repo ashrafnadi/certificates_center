@@ -76,15 +76,14 @@
         <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm h-100 stat-card">
                 <div class="card-body text-center">
-
-                        <div class="stat-icon-sm bg-primary bg-opacity-10 text-primary mx-auto mb-2">
-                            <i class="bi bi-people fs-3"></i>
-                        </div>
-                        <div>
-                            <h6 class="text-muted mb-1 small">الخريجين</h6>
-                            <h3 class="mb-0 fw-bold">{{ total_graduates }}</h3>
-                        </div>
+                    <div class="stat-icon-sm bg-primary bg-opacity-10 text-primary mx-auto mb-2">
+                        <i class="bi bi-people fs-3"></i>
                     </div>
+                    <div>
+                        <h6 class="text-muted mb-1 small">الخريجين</h6>
+                        <h3 class="mb-0 fw-bold">{{ total_graduates }}</h3>
+                    </div>
+                </div>
             </div>
         </div>
         {% if user_role == "auditor" or user.is_staff %}
@@ -202,7 +201,7 @@
                                             <td><span class="badge bg-secondary">{{ tx.transaction_id }}</span></td>
                                             <td class="fw-semibold">{{ tx.transaction_descripsion }}</td>
                                             <td><small class="text-muted">{{ tx.transaction_date|date:"Y-m-d H:i" }}</small></td>
-                                            <td><span class="badge bg-light text-dark">{{ tx.faculty_id }}</span></td>
+                                            <td><span class="badge bg-light text-dark">{{ tx.faculty }}</span></td>
                                             <td><span class="badge bg-light text-dark">{{ tx.graduate_count }}</span></td>
                                         </tr>
                                     {% endfor %}
@@ -307,6 +306,5 @@
                 </div>
             </div>
         </div>
-        
     </div>
 {% endblock %}

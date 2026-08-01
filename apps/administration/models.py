@@ -123,9 +123,11 @@ class Specialization(models.Model):
 class Transaction(models.Model):
     transaction_id = models.BigIntegerField(primary_key=True)
     transaction_date = models.DateTimeField()
-    user_id = models.BigIntegerField()
+    user = models.ForeignKey(
+        "Users_Profile", on_delete=models.CASCADE, blank=True, null=True
+    )
     transaction_descripsion = models.CharField(max_length=100)
-    faculty_id = models.ForeignKey(
+    faculty = models.ForeignKey(
         "Faculty", on_delete=models.CASCADE, blank=True, null=True
     )
 

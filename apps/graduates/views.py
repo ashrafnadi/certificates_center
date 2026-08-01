@@ -1,4 +1,4 @@
-from django.db.models import Count, Q, Exists, OuterRef
+from django.db.models import Count, Q
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from apps.administration.models import (
@@ -14,8 +14,6 @@ from apps.graduates.models import Graduate, Certificate, History
 def index(request):
     """
     Dashboard view showing role-based KPIs and statistics.
-    Optimized to minimize query count using aggregates, annotations,
-    subqueries, and Exists() instead of COUNT+GROUP BY.
     """
     user = request.user
     role = request.session.get("user_role") or getattr(user, "role", "employee")
@@ -39,10 +37,10 @@ def index(request):
         grad_filter = {}
         scope_label = "جميع الكليات"
 
-    # ── Base querysets (cached, not evaluated yet) ──
+    # ── Base querysets ──
     base_grad_qs = Graduate.objects.filter(**grad_filter)
 
-    # Certificate subquery — Django generates SQL subquery, no IDs loaded into Python
+    # Certificate subquery via SQL IN (SELECT ...)
     if grad_filter:
         cert_qs = Certificate.objects.filter(
             graduate_id__in=base_grad_qs.values("graduate_id")
@@ -89,7 +87,6 @@ def index(request):
         ),
         "scope_label": scope_label,
         "selected_faculty_name": selected_faculty_name,
-        # Core KPIs
         "total_graduates": total_graduates,
         "total_certificates": total_certificates,
         "printed_certificates": printed_certificates,
@@ -113,25 +110,25 @@ def index(request):
         context["total_users"] = Users_Profile.objects.count()
         context["upload_errors"] = Upload_Error.objects.count()
 
-        # Optimized: EXISTS subquery instead of annotate(Count)+GROUP BY+HAVING
-        # Reduces 92ms → ~5ms, eliminates GROUP BY on faculty_id
-        has_graduates = Graduate.objects.filter(transaction_id=OuterRef("pk"))
+        # Fast EXISTS subquery
         context["recent_transactions"] = (
-            Transaction.objects.filter(Exists(has_graduates))
-            .select_related("faculty_id")
+            Transaction.objects.annotate(graduate_count=Count("graduate"))
+            .filter(graduate_count__gt=0)
+            .select_related("faculty")
             .order_by("-transaction_date")[:8]
         )
 
-        # Optimized: Single annotate query replaces 17 per-faculty COUNT queries
-        all_grad_count = Graduate.objects.count() or 1
+        # ── Faculty breakdown ──
+        if grad_filter:
+            all_grad_count = Graduate.objects.count() or 1
+        else:
+            all_grad_count = total_graduates or 1
+
         breakdown_qs = (
             Faculty.objects.annotate(
                 grad_count=Count(
                     "graduate",
-                    filter=~Q(
-                        graduate__ischeked="N",
-                        graduate__ischeked2="N",
-                    ),
+                    filter=Q(graduate__ischeked="Y") | Q(graduate__ischeked2="Y"),
                 )
             )
             .filter(grad_count__gt=0)
@@ -152,8 +149,8 @@ def index(request):
     # AUDITOR KPIs
     # ═══════════════════════════════════════════════════════════════
     if role == "auditor" or is_admin or is_superuser:
-        context["unchecked_graduates"] = base_grad_qs.exclude(
-            ischeked="Y", ischeked2="Y"
+        context["unchecked_graduates"] = base_grad_qs.filter(
+            Q(ischeked="N") | Q(ischeked2="N")
         ).count()
 
         hist_filter = {}
