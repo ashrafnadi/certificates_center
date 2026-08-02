@@ -93,9 +93,10 @@ def index(request):
         "print_pct": print_pct,
         "pending_pct": pending_pct,
         "deliver_pct": deliver_pct,
-        "recent_graduates": base_grad_qs.select_related("faculty").order_by(
-            "-graduate_id"
-        )[:8],
+        # FIX: Added select_related for regulation__degree and specialization
+        "recent_graduates": base_grad_qs.select_related(
+            "faculty", "specialization", "regulation", "regulation__degree"
+        ).order_by("-graduate_id")[:8],
         "recent_certificates": cert_qs.order_by("-certificate_date")[:8],
     }
 
@@ -299,6 +300,7 @@ def graduate_list(request):
     certificates = []
     if graduate_id:
         try:
+            # FIX: Added regulation__degree to select_related
             selected_graduate = get_object_or_404(
                 Graduate.objects.select_related(
                     "nationality",
@@ -306,6 +308,7 @@ def graduate_list(request):
                     "specialization",
                     "faculty_turn",
                     "regulation",
+                    "regulation__degree",  # ← FIX: fetch degree via regulation
                 ),
                 graduate_id=int(graduate_id),
             )
@@ -315,10 +318,6 @@ def graduate_list(request):
         except (ValueError, TypeError):
             selected_graduate = None
 
-    # ═══════════════════════════════════════════════════════════════
-    # CRITICAL FIX: Always include selected_faculty_id in context
-    # so templates can use it without crashing
-    # ═══════════════════════════════════════════════════════════════
     context = {
         "user_role": role,
         "is_director": is_director,
@@ -327,7 +326,7 @@ def graduate_list(request):
         "specializations": specializations,
         "graduates": graduates,
         "selected_faculty": current_faculty,
-        "selected_faculty_id": resolved_faculty_id,  # <-- ALWAYS SET
+        "selected_faculty_id": resolved_faculty_id,
         "selected_faculty_name": selected_faculty_name,
         "selected_section_id": section_id or "",
         "selected_specialization_id": specialization_id or "",

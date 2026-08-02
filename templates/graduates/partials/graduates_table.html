@@ -58,7 +58,7 @@
                                     <span class="badge bg-info bg-opacity-10 text-info">{{ g.grade_name_ar|default:"—" }}</span>
                                 </td>
                                 <td data-label="الحالة">
-                                    {% if g.ischeked == "Y" and g.ischeked2 == "Y" %}
+                                    {% if g.ischeked == "Y" and g.ischeked == "Y" %}
                                         <span class="badge bg-success">تم التحقق</span>
                                     {% else %}
                                         <span class="badge bg-warning text-dark">قيد المراجعة</span>

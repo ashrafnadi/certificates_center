@@ -477,7 +477,6 @@
     height: 220px;
     object-fit: cover;
     border: 3px solid var(--bs-primary);
-    border-radius: 12px;
 }
 
 /* Table row hover enhancement */
@@ -534,7 +533,6 @@
     height: 220px;
     object-fit: cover;
     border: 3px solid var(--bs-primary);
-    border-radius: 12px;
 }
 
 /* Modal label styling */
@@ -596,7 +594,6 @@
     height: 220px;
     object-fit: cover;
     border: 3px solid var(--bs-primary);
-    border-radius: 12px;
 }
 
 /* Modal label styling */
@@ -647,4 +644,125 @@
     .grad-filter-wrap {
         max-width: 100%;
     }
+}
+
+/* ----------------------------------------------------------
+   1. Modal Overrides
+   ---------------------------------------------------------- */
+
+/* Force modal to show (replaces style="display: block") */
+.modal-force-show {
+  display: block !important;
+}
+
+/* Modal backdrop cleanup helper */
+.modal-backdrop-static {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+}
+
+/* ----------------------------------------------------------
+   2. Graduate Photos
+   ---------------------------------------------------------- */
+
+.graduate-photo {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
+.graduate-photo-sm {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+}
+
+.graduate-photo-lg {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+}
+
+/* ----------------------------------------------------------
+   3. Debug / Dev Helpers
+   ---------------------------------------------------------- */
+
+.debug-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ----------------------------------------------------------
+   4. HTMX Loading Indicators
+   ---------------------------------------------------------- */
+
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  display: inline-block;
+}
+
+/* ----------------------------------------------------------
+   5. Table Cell Utilities
+   ---------------------------------------------------------- */
+
+.table-avatar {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* ----------------------------------------------------------
+   6. RTL Fixes for Bootstrap
+   ---------------------------------------------------------- */
+
+[dir="ltr"] {
+  text-align: left;
+}
+
+/* Ensure proper text alignment for English names */
+.text-en {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+}
+
+/* ----------------------------------------------------------
+   7. Card & Layout Tweaks
+   ---------------------------------------------------------- */
+
+.card-header-icon {
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .card-header-icon {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* Smooth modal transitions */
+.modal.fade.show {
+  transition: opacity 0.15s linear;
+}
+
+/* ----------------------------------------------------------
+   8. Print Button Group
+   ---------------------------------------------------------- */
+
+.btn-action-group .btn {
+  margin-left: 0.25rem;
+}
+
+[dir="rtl"] .btn-action-group .btn {
+  margin-left: 0;
+  margin-right: 0.25rem;
 }
