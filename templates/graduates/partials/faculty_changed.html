@@ -1,4 +1,4 @@
-<!-- Out-of-band update for the section select -->
+<!-- Out-of-band: update the section select with new options -->
 <select name="section_id"
         id="sectionSelect"
         class="form-select form-select-lg"
@@ -11,9 +11,11 @@
     <option value="">اختر القسم...</option>
     {% for s in sections %}
         <option value="{{ s.section_id }}">{{ s.section_ar_name }}</option>
+    {% empty %}
+        <option value="" disabled>لا توجد أقسام</option>
     {% endfor %}
 </select>
-<!-- Main response body: empty specialization select -->
+<!-- Main body: empty specialization select (swaps into #specializationsContainer) -->
 <select name="specialization_id"
         id="specializationSelect"
         class="form-select form-select-lg"

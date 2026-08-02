@@ -14,8 +14,10 @@ class Certificate(models.Model):
     certificate_serial = models.CharField(max_length=20)
     certificate_date = models.DateTimeField()
     certificate_status = models.CharField(max_length=2)
+    # db_column="graduate" because old schema used BigIntegerField named "graduate"
     graduate = models.ForeignKey(
-        "Graduate", on_delete=models.CASCADE, blank=True, null=True
+        "Graduate", on_delete=models.CASCADE, blank=True, null=True,
+        db_column="graduate"
     )
     print_date = models.DateTimeField(blank=True, null=True)
     delivered = models.CharField(max_length=2, blank=True, null=True)
@@ -28,7 +30,6 @@ class Certificate(models.Model):
     def __str__(self):
         return str(self.certificate_id)
 
-    # FIXED #3: Boolean property for legacy CharField delivered flag
     @property
     def is_delivered(self):
         return self.delivered in ("Y", "y", "1", "T", "t", "True", "true", "YES", "yes")
@@ -70,8 +71,10 @@ class Graduate(models.Model):
     graduate_ar_pob = models.CharField(max_length=100)
     graduate_en_pob = models.CharField(max_length=100)
     graduate_dob = models.DateTimeField()
+    # db_column="nationality" because old schema used BigIntegerField named "nationality"
     nationality = models.ForeignKey(
-        Nationality, on_delete=models.CASCADE, blank=True, null=True
+        Nationality, on_delete=models.CASCADE, blank=True, null=True,
+        db_column="nationality"
     )
     graduate_gendar = models.SmallIntegerField()
     graduate_notes = models.CharField(max_length=200, blank=True, null=True)
@@ -84,28 +87,33 @@ class Graduate(models.Model):
     grade_name_en = models.CharField(max_length=50, blank=True, null=True)
     ischeked = models.CharField(max_length=2)
     ischeked2 = models.CharField(max_length=20)
+    # db_column="specialization" because old schema used BigIntegerField named "specialization"
     specialization = models.ForeignKey(
-        Specialization, on_delete=models.CASCADE, blank=True, null=True
+        Specialization, on_delete=models.CASCADE, blank=True, null=True,
+        db_column="specialization"
     )
+    # db_column="faculty_turn" because old schema used BigIntegerField named "faculty_turn"
     faculty_turn = models.ForeignKey(
-        Faculty_Turn, on_delete=models.CASCADE, blank=True, null=True
+        Faculty_Turn, on_delete=models.CASCADE, blank=True, null=True,
+        db_column="faculty_turn"
     )
+    # db_column="regulation" because old schema used BigIntegerField named "regulation"
     regulation = models.ForeignKey(
-        Regulation, on_delete=models.CASCADE, blank=True, null=True
+        Regulation, on_delete=models.CASCADE, blank=True, null=True,
+        db_column="regulation"
     )
     isdelete = models.CharField(max_length=2, blank=True, null=True)
+    # db_column="transaction" because old schema used BigIntegerField named "transaction"
     transaction = models.ForeignKey(
-        Transaction, on_delete=models.CASCADE, blank=True, null=True
+        Transaction, on_delete=models.CASCADE, blank=True, null=True,
+        db_column="transaction"
     )
     lastuser = models.BigIntegerField()
     transdesciption = models.CharField(max_length=200)
-    # FIXED #6: added related_name for clean reverse queries
+    # db_column="faculty" because old schema used BigIntegerField named "faculty"
     faculty = models.ForeignKey(
-        Faculty,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        related_name="graduates",
+        Faculty, on_delete=models.CASCADE, blank=True, null=True,
+        related_name="graduates", db_column="faculty"
     )
     ic_card_init = models.CharField(max_length=20, blank=True, null=True)
 
@@ -115,7 +123,6 @@ class Graduate(models.Model):
     def __str__(self):
         return str(self.graduate_id)
 
-    # FIXED #3: Boolean properties for legacy CharField flags
     @property
     def is_checked(self):
         return self.ischeked in ("Y", "y", "1", "T", "t", "True", "true", "YES", "yes")
@@ -143,8 +150,10 @@ class Graduate(models.Model):
 
 class History(models.Model):
     history_id = models.DecimalField(primary_key=True, max_digits=20, decimal_places=0)
+    # db_column="graduate" because old schema used BigIntegerField named "graduate"
     graduate = models.ForeignKey(
-        "Graduate", on_delete=models.CASCADE, blank=False, null=False
+        "Graduate", on_delete=models.CASCADE, blank=False, null=False,
+        db_column="graduate"
     )
     history_date = models.DateTimeField(blank=True, null=True)
     history_field = models.CharField(max_length=400, blank=True, null=True)
@@ -152,11 +161,15 @@ class History(models.Model):
     history_new = models.CharField(max_length=400, blank=True, null=True)
     history_type = models.CharField(max_length=20, blank=True, null=True)
     history_desc = models.CharField(max_length=200, blank=True, null=True)
+    # db_column="authunticated_user_id" because old schema used BigIntegerField named "authunticated_user_id"
     authunticated_user_id = models.ForeignKey(
-        Authenticated_User, on_delete=models.CASCADE, blank=True, null=True
+        Authenticated_User, on_delete=models.CASCADE, blank=True, null=True,
+        db_column="authunticated_user_id"
     )
+    # db_column="faculty" because old schema used BigIntegerField named "faculty"
     faculty = models.ForeignKey(
-        Faculty, on_delete=models.CASCADE, blank=True, null=True
+        Faculty, on_delete=models.CASCADE, blank=True, null=True,
+        db_column="faculty"
     )
 
     class Meta:

@@ -1,83 +1,93 @@
+{% load static %}
 {% if graduates %}
-<div class="card border-0 shadow-sm">
-    <div class="card-header border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">
-            <i class="bi bi-list-ul me-2 text-primary"></i>
-            بيانات الخريجين
-            <span class="badge bg-primary ms-2">{{ graduates|length }}</span>
-        </h5>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th class="border-0">#</th>
-                        <th class="border-0">الاسم</th>
-                        <th class="border-0">الرقم القومي</th>
-                        <th class="border-0">محل الميلاد</th>
-                        <th class="border-0">الجنسية</th>
-                        <th class="border-0">النوع</th>
-                        <th class="border-0">إجراء</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for g in graduates %}
-                    <tr>
-                        <td>
-                            <span class="badge bg-light text-dark">{{ g.graduate_id }}</span>
-                        </td>
-                        <td class="fw-semibold">{{ g.graduate_ar_name|truncatechars:30 }}</td>
-                        <td>
-                            <small class="font-monospace">{{ g.graduate_id_card }}</small>
-                        </td>
-                        <td>{{ g.graduate_ar_pob|default:"--" }}</td>
-                        <td>
-                            <span class="badge bg-light text-dark">
-                                {{ g.nationality.nationality_ar_name|default:"--" }}
-                            </span>
-                        </td>
-                        <td>
-                            {% if g.graduate_gendar == 1 %}
-                                <span class="badge bg-info">ذكر</span>
-                            {% elif g.graduate_gendar == 2 %}
-                                <span class="badge bg-pink text-white">أنثى</span>
-                            {% else %}
-                                <span class="badge bg-secondary">--</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-sm btn-outline-primary"
-                                    hx-get="{% url 'graduates:graduate_list' %}?graduate_id={{ g.graduate_id }}&faculty_id={{ selected_faculty.faculty_id|default:selected_faculty_id }}&section_id={{ selected_section_id }}&specialization_id={{ selected_specialization_id }}"
-                                    hx-target="#graduateDetailContainer"
-                                    hx-swap="innerHTML">
-                                <i class="bi bi-eye me-1"></i>عرض
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header border-bottom d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-list-ul me-2 text-primary"></i>قائمة الخريجين
+            </h5>
+            <span class="badge bg-primary">{{ graduates|length }} خريج</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive-wrapper">
+                <table class="table table-hover table-responsive-card mb-0 align-middle">
+                    <thead class="table">
+                        <tr>
+                            <th class="ps-4">#</th>
+                            <th>الاسم</th>
+                            <th>رقم البطاقة</th>
+                            <th>الكلية</th>
+                            <th>التخصص</th>
+                            <th>الدرجة</th>
+                            <th>الحالة</th>
+                            <th class="pe-4">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for g in graduates %}
+                            <tr>
+                                <td class="ps-4" data-label="#">{{ forloop.counter }}</td>
+                                <td data-label="الاسم">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="grad-avatar">{{ g.graduate_ar_name|first }}</div>
+                                        <div>
+                                            <div class="fw-semibold">{{ g.graduate_ar_name }}</div>
+                                            <div class="text-muted fs-sm">{{ g.graduate_en_name }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="رقم البطاقة">
+                                    <span class="font-monospace">{{ g.graduate_id_card }}</span>
+                                </td>
+                                <td data-label="الكلية">{{ g.faculty.faculty_ar_name|default:"—" }}</td>
+                                <td data-label="التخصص">{{ g.specialization.specialization_ar_name|default:"—" }}</td>
+                                <td data-label="الدرجة">
+                                    <span class="badge bg-info bg-opacity-10 text-info">{{ g.grade_name_ar|default:"—" }}</span>
+                                </td>
+                                <td data-label="الحالة">
+                                    {% if g.ischeked == "Y" %}
+                                        <span class="badge bg-success">تم التحقق</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">قيد المراجعة</span>
+                                    {% endif %}
+                                </td>
+                                <td class="pe-4" data-label="إجراءات">
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            hx-get="{% url 'graduates:graduate_list' %}?graduate_id={{ g.graduate_id }}&specialization_id={{ selected_specialization_id|default:'' }}&section_id={{ selected_section_id|default:'' }}&faculty_id={{ selected_faculty.faculty_id|default:selected_faculty_id|default:'' }}"
+                                            hx-target="#modalContainer"
+                                            hx-swap="innerHTML">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 {% else %}
-<div class="card border-0 shadow-sm">
-    <div class="card-body text-center text-muted py-5">
-        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-        <h5>لا توجد بيانات</h5>
-        <p class="mb-0">
-            {% if not selected_faculty %}
-                {% if is_director %}يرجى اختيار الكلية{% else %}لا يوجد كلية محددة{% endif %}
-            {% elif not selected_section_id %}
-                يرجى اختيار القسم
-            {% elif not selected_specialization_id %}
-                يرجى اختيار التخصص
-            {% else %}
-                لا يوجد خريجين مطابقين للمعايير المحددة
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center text-muted py-5">
+            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+            <h5>لا توجد نتائج</h5>
+            <p class="mb-0">
+                {% if search_query %}
+                    لم يتم العثور على خريجين مطابقين لـ "<strong>{{ search_query }}</strong>"
+                {% elif not selected_faculty %}
+                    {% if is_director %}يرجى اختيار الكلية{% else %}يرجى اختيار الكلية{% endif %}
+                {% elif not selected_section_id %}
+                    يرجى اختيار القسم
+                {% elif not selected_specialization_id %}
+                    يرجى اختيار التخصص
+                {% else %}
+                    لا يوجد خريجين مطابقين للمعايير المحددة
+                {% endif %}
+            </p>
+            {% if debug_info and user.is_superuser %}
+                <hr />
+                <pre class="text-start text-muted" style="font-size:0.75rem;">{{ debug_info|pprint }}</pre>
             {% endif %}
-        </p>
+        </div>
     </div>
-</div>
 {% endif %}

@@ -1,4 +1,4 @@
-{% if request.user.is_admin %}
+{% if request.user.is_superuser %}
     {% include 'partials/admin_side_menu.html' %}
 {% elif request.user.profile.is_supervisor %}
     {% include 'partials/supervisor_side_menu.html' %}

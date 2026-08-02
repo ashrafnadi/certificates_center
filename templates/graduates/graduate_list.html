@@ -28,63 +28,101 @@
             </div>
         </div>
     </div>
-    <!-- Filters Row -->
+    <!-- Search Bar -->
     <div class="row g-3 mb-4">
-        <!-- Faculty Filter (Directors/Supervisors/Superusers only) -->
-        {% if is_director %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-primary text-white border-primary">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text"
+                               name="q"
+                               class="form-control"
+                               placeholder="ابحث بأي بيانات (الاسم، رقم البطاقة، التخصص، الكلية، الجنسية...)"
+                               value="{{ search_query }}"
+                               hx-get="{% url 'graduates:graduate_list' %}"
+                               hx-target="#graduatesTableContainer"
+                               hx-swap="innerHTML"
+                               hx-indicator="#loadingIndicator"
+                               hx-trigger="keyup changed delay:500ms, search"
+                               hx-include="[name='q']" />
+                        {% if search_query %}
+                            <a href="{% url 'graduates:graduate_list' %}"
+                               class="btn btn-outline-secondary"
+                               type="button">
+                                <i class="bi bi-x-lg"></i> إلغاء البحث
+                            </a>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        <i class="bi bi-info-circle me-1"></i>
+                        يمكنك البحث بالاسم العربي أو الإنجليزي، رقم البطاقة، التخصص، الكلية، الجنسية، التقدير، أو أي بيانات أخرى.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Filters Row (hidden during search) -->
+    {% if not search_query %}
+        <div class="row g-3 mb-4" id="filtersRow">
+            <!-- Faculty Filter (Directors/Supervisors/Superusers only) -->
+            {% if is_director %}
+                <div class="col-12 col-md-4">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-building me-1 text-primary"></i>الكلية
+                    </label>
+                    <select name="faculty_id"
+                            id="facultySelect"
+                            class="form-select form-select-lg"
+                            hx-get="{% url 'graduates:graduate_list' %}"
+                            hx-target="#specializationsContainer"
+                            hx-swap="innerHTML"
+                            hx-indicator="#loadingIndicator"
+                            hx-include="[name='faculty_id']">
+                        <option value="">اختر الكلية...</option>
+                        {% for f in faculties %}
+                            <option value="{{ f.faculty_id }}"
+                                    {% if selected_faculty and selected_faculty.faculty_id == f.faculty_id %}selected{% endif %}>
+                                {{ f.faculty_ar_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+            <!-- Section Filter -->
             <div class="col-12 col-md-4">
                 <label class="form-label fw-semibold">
-                    <i class="bi bi-building me-1 text-primary"></i>الكلية
+                    <i class="bi bi-grid me-1 text-info"></i>القسم
                 </label>
-                <select name="faculty_id"
-                        id="facultySelect"
+                <select name="section_id"
+                        id="sectionSelect"
                         class="form-select form-select-lg"
                         hx-get="{% url 'graduates:graduate_list' %}"
                         hx-target="#specializationsContainer"
                         hx-swap="innerHTML"
                         hx-indicator="#loadingIndicator"
-                        hx-include="[name='faculty_id']">
-                    <option value="">اختر الكلية...</option>
-                    {% for f in faculties %}
-                        <option value="{{ f.faculty_id }}"
-                                {% if selected_faculty and selected_faculty.faculty_id == f.faculty_id %}selected{% endif %}>
-                            {{ f.faculty_ar_name }}
+                        hx-include="[name='faculty_id'],[name='section_id']"
+                        {% if not sections %}disabled{% endif %}>
+                    <option value="">اختر القسم...</option>
+                    {% for s in sections %}
+                        <option value="{{ s.section_id }}"
+                                {% if selected_section_id == s.section_id|stringformat:"s" %}selected{% endif %}>
+                            {{ s.section_ar_name }}
                         </option>
                     {% endfor %}
                 </select>
             </div>
-        {% endif %}
-        <!-- Section Filter -->
-        <div class="col-12 col-md-4">
-            <label class="form-label fw-semibold">
-                <i class="bi bi-grid me-1 text-info"></i>القسم
-            </label>
-            <select name="section_id"
-                    id="sectionSelect"
-                    class="form-select form-select-lg"
-                    hx-get="{% url 'graduates:graduate_list' %}"
-                    hx-target="#specializationsContainer"
-                    hx-swap="innerHTML"
-                    hx-indicator="#loadingIndicator"
-                    hx-include="[name='faculty_id'],[name='section_id']"
-                    {% if not sections %}disabled{% endif %}>
-                <option value="">اختر القسم...</option>
-                {% for s in sections %}
-                    <option value="{{ s.section_id }}"
-                            {% if selected_section_id == s.section_id|stringformat:"s" %}selected{% endif %}>
-                        {{ s.section_ar_name }}
-                    </option>
-                {% endfor %}
-            </select>
+            <!-- Specialization Filter -->
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold">
+                    <i class="bi bi-book me-1 text-success"></i>التخصص
+                </label>
+                <div id="specializationsContainer">{% include 'graduates/partials/specializations.html' %}</div>
+            </div>
         </div>
-        <!-- Specialization Filter -->
-        <div class="col-12 col-md-4">
-            <label class="form-label fw-semibold">
-                <i class="bi bi-book me-1 text-success"></i>التخصص
-            </label>
-            <div id="specializationsContainer">{% include 'graduates/partials/specializations.html' %}</div>
-        </div>
-    </div>
+    {% endif %}
     <!-- Loading Indicator -->
     <div id="loadingIndicator" class="htmx-indicator text-center py-3">
         <div class="spinner-border text-primary" role="status">
@@ -93,6 +131,8 @@
     </div>
     <!-- Graduates Table -->
     <div id="graduatesTableContainer">{% include 'graduates/partials/graduates_table.html' %}</div>
-    <!-- Graduate Detail Modal/Panel -->
-    <div id="graduateDetailContainer" class="mt-4">{% include 'graduates/partials/graduate_detail.html' %}</div>
+    <!-- Modal Container (hidden, populated by HTMX) -->
+    <div id="modalContainer"></div>
+    <!-- Graduate Detail Inline Panel (kept for non-HTMX fallback) -->
+    {% comment %} <div id="graduateDetailContainer" class="mt-4">{% include 'graduates/partials/graduate_detail.html' %}</div> {% endcomment %}
 {% endblock %}

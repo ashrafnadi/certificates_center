@@ -1,3 +1,7 @@
+import logging
+import traceback
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, render
@@ -12,27 +16,23 @@ from apps.administration.models import (
 )
 from apps.graduates.models import Certificate, Graduate, History
 
+logger = logging.getLogger(__name__)
+
 
 @login_required
 def index(request):
-    """
-    Dashboard view showing role-based KPIs and statistics.
-    """
+    """Dashboard view showing role-based KPIs and statistics."""
     user = request.user
     role = request.session.get("user_role") or getattr(user, "role", "employee")
     is_admin = request.session.get("user_is_admin", False)
     is_superuser = getattr(user, "is_staff", False)
 
-    # ── Role flags ──
-    if is_superuser:
-        request.user.is_admin = True
-    elif hasattr(request.user, "profile"):
-        setattr(request.user, f"is_{request.user.profile.role}", True)
+    if is_superuser and not hasattr(user, "is_admin"):
+        user.is_admin = True
 
     selected_faculty_id = request.session.get("selected_faculty_id")
     selected_faculty_name = request.session.get("selected_faculty_name", "")
 
-    # ── Data scope ──
     if role == "employee" and selected_faculty_id:
         grad_filter = {"faculty_id": selected_faculty_id}
         scope_label = selected_faculty_name or "الكلية المختارة"
@@ -40,16 +40,13 @@ def index(request):
         grad_filter = {}
         scope_label = "جميع الكليات"
 
-    # ── Base querysets ──
     base_grad_qs = Graduate.objects.filter(**grad_filter)
 
-    # FIXED #6: Use FK relation instead of raw graduate_id BigInteger filter
     if grad_filter:
         cert_qs = Certificate.objects.filter(graduate__in=base_grad_qs)
     else:
         cert_qs = Certificate.objects.all()
 
-    # ── Core KPIs: ALL certificate stats in ONE aggregate query ──
     cert_stats = cert_qs.aggregate(
         total=Count("certificate_id"),
         printed=Count("certificate_id", filter=Q(print_date__isnull=False)),
@@ -96,16 +93,12 @@ def index(request):
         "print_pct": print_pct,
         "pending_pct": pending_pct,
         "deliver_pct": deliver_pct,
-        # Recent lists
         "recent_graduates": base_grad_qs.select_related("faculty").order_by(
             "-graduate_id"
         )[:8],
         "recent_certificates": cert_qs.order_by("-certificate_date")[:8],
     }
 
-    # ═══════════════════════════════════════════════════════════════
-    # DIRECTOR / SUPERVISOR KPIs
-    # ═══════════════════════════════════════════════════════════════
     if role in ("director", "supervisor") or is_admin or is_superuser:
         context["total_faculties"] = Faculty.objects.count()
         context["total_users"] = Users_Profile.objects.count()
@@ -118,12 +111,8 @@ def index(request):
             .order_by("-transaction_date")[:8]
         )
 
-        if grad_filter:
-            all_grad_count = Graduate.objects.count() or 1
-        else:
-            all_grad_count = total_graduates or 1
+        all_grad_count = Graduate.objects.count() or 1
 
-        # FIXED #6: Use related_name "graduates" instead of invalid "graduate"
         breakdown_qs = (
             Faculty.objects.annotate(
                 grad_count=Count(
@@ -145,9 +134,6 @@ def index(request):
             for f in breakdown_qs
         ]
 
-    # ═══════════════════════════════════════════════════════════════
-    # AUDITOR KPIs
-    # ═══════════════════════════════════════════════════════════════
     if role == "auditor" or is_admin or is_superuser:
         context["unchecked_graduates"] = base_grad_qs.filter(
             Q(ischeked="N") & Q(ischeked2="N")
@@ -169,10 +155,7 @@ def index(request):
 @login_required
 def graduate_list(request):
     """
-    Graduate list view with role-based filtering:
-    - Director/Supervisor/Superuser: All faculties -> sections -> specializations -> graduates
-    - Auditor: Login faculty only, ischeked='N', must select section -> specialization
-    - Employee: Login faculty only, must select section -> specialization
+    Graduate list view with role-based filtering + global search.
     """
     user = request.user
     role = request.session.get("user_role") or getattr(user, "role", "employee")
@@ -182,10 +165,8 @@ def graduate_list(request):
     selected_faculty_id = request.session.get("selected_faculty_id")
     selected_faculty_name = request.session.get("selected_faculty_name", "")
 
-    # ── Determine scope ──
     is_director = role in ("director", "supervisor") or is_admin or is_superuser
 
-    # Faculties list (only for directors/supervisors/superusers)
     faculties = Faculty.objects.all().order_by("faculty_ar_name") if is_director else []
 
     # GET parameters
@@ -193,20 +174,30 @@ def graduate_list(request):
     section_id = request.GET.get("section_id")
     specialization_id = request.GET.get("specialization_id")
     graduate_id = request.GET.get("graduate_id")
+    search_query = request.GET.get("q", "").strip()
 
-    # ── Faculty filter ──
+    # ── Faculty resolution ──
+    current_faculty = None
+    resolved_faculty_id = None
+
     if is_director and faculty_id:
-        current_faculty = get_object_or_404(Faculty, pk=faculty_id)
+        try:
+            current_faculty = Faculty.objects.get(pk=int(faculty_id))
+            resolved_faculty_id = faculty_id
+        except (Faculty.DoesNotExist, ValueError, TypeError):
+            current_faculty = None
+            resolved_faculty_id = None
     elif not is_director and selected_faculty_id:
-        current_faculty = get_object_or_404(Faculty, pk=selected_faculty_id)
-        faculty_id = selected_faculty_id
-    else:
-        current_faculty = None
+        try:
+            current_faculty = Faculty.objects.get(pk=int(selected_faculty_id))
+            resolved_faculty_id = str(selected_faculty_id)
+        except (Faculty.DoesNotExist, ValueError, TypeError):
+            current_faculty = None
+            resolved_faculty_id = None
 
     # ── Sections list ──
     sections = []
     if current_faculty:
-        # FIXED #2: use corrected field name section_ar_name
         sections = Section.objects.filter(faculty=current_faculty).order_by(
             "section_ar_name"
         )
@@ -214,41 +205,120 @@ def graduate_list(request):
     # ── Specializations list ──
     specializations = []
     if section_id:
-        specializations = Specialization.objects.filter(section_id=section_id).order_by(
-            "specialization_ar_name"
-        )
+        try:
+            specializations = Specialization.objects.filter(
+                section_id=int(section_id)
+            ).order_by("specialization_ar_name")
+        except (ValueError, TypeError):
+            specializations = []
 
     # ── Graduates queryset ──
     graduates = Graduate.objects.none()
-    if current_faculty and specialization_id:
-        graduates = Graduate.objects.filter(
-            faculty=current_faculty,
-            specialization_id=specialization_id,
-        )
+    debug_info = {}
+    error_message = None
 
-        # Auditor: only unchecked graduates
-        if role == "auditor":
-            graduates = graduates.filter(ischeked="N")
+    # SEARCH MODE
+    if search_query:
+        try:
+            search_filter = (
+                Q(graduate_ar_name__icontains=search_query)
+                | Q(graduate_en_name__icontains=search_query)
+                | Q(graduate_id_card__icontains=search_query)
+                | Q(graduate_ar_pob__icontains=search_query)
+                | Q(graduate_en_pob__icontains=search_query)
+                | Q(grade_name_ar__icontains=search_query)
+                | Q(grade_name_en__icontains=search_query)
+                | Q(grade_letter__icontains=search_query)
+                | Q(ic_card_init__icontains=search_query)
+                | Q(graduate_notes__icontains=search_query)
+                | Q(nationality__nationality_ar_name__icontains=search_query)
+                | Q(nationality__nationality_en_name__icontains=search_query)
+                | Q(faculty__faculty_ar_name__icontains=search_query)
+                | Q(faculty__faculty_en_name__icontains=search_query)
+                | Q(specialization__specialization_ar_name__icontains=search_query)
+                | Q(specialization__specialization_en_name__icontains=search_query)
+                | Q(faculty_turn__turn_ar_name__icontains=search_query)
+                | Q(faculty_turn__turn_en_name__icontains=search_query)
+                | Q(regulation__regulation_ar_name__icontains=search_query)
+            )
 
-        graduates = graduates.select_related(
-            "nationality", "faculty", "specialization"
-        ).order_by("-graduate_id")
+            if not is_director and selected_faculty_id:
+                graduates = Graduate.objects.filter(
+                    faculty_id=int(selected_faculty_id)
+                ).filter(search_filter)
+            else:
+                graduates = Graduate.objects.filter(search_filter)
+
+            graduates = graduates.select_related(
+                "nationality", "faculty", "specialization"
+            ).order_by("-graduate_id")
+
+            debug_info = {
+                "mode": "search",
+                "query": search_query,
+                "count": graduates.count(),
+            }
+        except Exception as e:
+            error_message = f"Search error: {str(e)}"
+            logger.exception("Search query failed")
+
+    # CASCADE MODE
+    elif current_faculty and specialization_id:
+        try:
+            spec_id = int(specialization_id)
+            fac_id = current_faculty.faculty_id
+
+            graduates = Graduate.objects.filter(
+                faculty_id=fac_id,
+                specialization_id=spec_id,
+            )
+            if role == "auditor":
+                graduates = graduates.filter(ischeked="N")
+
+            graduates = graduates.select_related(
+                "nationality", "faculty", "specialization"
+            ).order_by("-graduate_id")
+
+            debug_info = {
+                "mode": "cascade",
+                "faculty_id": fac_id,
+                "specialization_id": spec_id,
+                "count": graduates.count(),
+            }
+        except Exception as e:
+            error_message = f"Cascade error: {str(e)}"
+            logger.exception("Cascade query failed")
+            debug_info = {
+                "mode": "cascade_error",
+                "error": str(e),
+                "traceback": traceback.format_exc(),
+            }
 
     # ── Graduate detail ──
     selected_graduate = None
     certificates = []
     if graduate_id:
-        selected_graduate = get_object_or_404(
-            Graduate.objects.select_related(
-                "nationality", "faculty", "specialization", "faculty_turn", "regulation"
-            ),
-            graduate_id=graduate_id,
-        )
-        # FIXED #6: Use FK relation instead of raw graduate_id filter
-        certificates = selected_graduate.certificate_set.all().order_by(
-            "-certificate_date"
-        )
+        try:
+            selected_graduate = get_object_or_404(
+                Graduate.objects.select_related(
+                    "nationality",
+                    "faculty",
+                    "specialization",
+                    "faculty_turn",
+                    "regulation",
+                ),
+                graduate_id=int(graduate_id),
+            )
+            certificates = selected_graduate.certificate_set.all().order_by(
+                "-certificate_date"
+            )
+        except (ValueError, TypeError):
+            selected_graduate = None
 
+    # ═══════════════════════════════════════════════════════════════
+    # CRITICAL FIX: Always include selected_faculty_id in context
+    # so templates can use it without crashing
+    # ═══════════════════════════════════════════════════════════════
     context = {
         "user_role": role,
         "is_director": is_director,
@@ -257,23 +327,37 @@ def graduate_list(request):
         "specializations": specializations,
         "graduates": graduates,
         "selected_faculty": current_faculty,
+        "selected_faculty_id": resolved_faculty_id,  # <-- ALWAYS SET
         "selected_faculty_name": selected_faculty_name,
-        "selected_section_id": section_id,
-        "selected_specialization_id": specialization_id,
+        "selected_section_id": section_id or "",
+        "selected_specialization_id": specialization_id or "",
         "selected_graduate": selected_graduate,
         "certificates": certificates,
+        "search_query": search_query,
+        "debug_info": debug_info if settings.DEBUG else None,
+        "error_message": error_message if settings.DEBUG else None,
     }
 
     # HTMX partial rendering
-    if request.headers.get("HX-Request"):
-        # FIXED: Handle faculty selection (updates section select + clears specializations)
-        if "faculty_id" in request.GET and "section_id" not in request.GET:
-            return render(request, "graduates/partials/faculty_changed.html", context)
-        elif "section_id" in request.GET and "specialization_id" not in request.GET:
-            return render(request, "graduates/partials/specializations.html", context)
-        elif "specialization_id" in request.GET and "graduate_id" not in request.GET:
+    is_htmx = request.headers.get("HX-Request") == "true"
+    if is_htmx:
+        has_grad = bool(graduate_id)
+        has_search = bool(search_query)
+        has_spec = bool(specialization_id)
+        has_section = bool(section_id)
+        has_faculty = bool(faculty_id)
+
+        if has_grad:
+            return render(
+                request, "graduates/partials/graduate_detail_modal.html", context
+            )
+        if has_search:
             return render(request, "graduates/partials/graduates_table.html", context)
-        elif "graduate_id" in request.GET:
-            return render(request, "graduates/partials/graduate_detail.html", context)
+        if has_spec:
+            return render(request, "graduates/partials/graduates_table.html", context)
+        if has_section:
+            return render(request, "graduates/partials/specializations.html", context)
+        if has_faculty:
+            return render(request, "graduates/partials/faculty_changed.html", context)
 
     return render(request, "graduates/graduate_list.html", context)

@@ -18,7 +18,9 @@ class UsersProfileAuthBackend(BaseBackend):
         profile.backend = "apps.administration.backends.UsersProfileAuthBackend"
         profile.is_authenticated = True
         profile.is_active = True
-        profile.is_staff = profile.isadmin not in (
+
+        # Determine admin/staff status
+        is_admin = profile.isadmin not in (
             None,
             "",
             "0",
@@ -27,7 +29,16 @@ class UsersProfileAuthBackend(BaseBackend):
             "No",
             "False",
         )
-        profile.is_superuser = profile.is_staff
+        profile.is_staff = is_admin
+        profile.is_superuser = is_admin
+
+        # FIXED: Set role flags for sidebar template compatibility
+        profile.is_admin = is_admin
+        profile.is_supervisor = profile.role == Users_Profile.ROLE_SUPERVISOR
+        profile.is_director = profile.role == Users_Profile.ROLE_DIRECTOR
+        profile.is_auditor = profile.role == Users_Profile.ROLE_AUDITOR
+        profile.is_employee = profile.role == Users_Profile.ROLE_EMPLOYEE
+
         profile.pk = profile.user_id
         profile.id = profile.user_id
         profile.username = profile.user_name
@@ -35,7 +46,6 @@ class UsersProfileAuthBackend(BaseBackend):
         profile.first_name = profile.user_short_name or ""
         profile.last_name = ""
 
-        # Use regular functions instead of lambdas for picklability / caching compatibility
         def _get_session_auth_hash(p=profile):
             return str(p.user_id)
 
@@ -67,7 +77,7 @@ class UsersProfileAuthBackend(BaseBackend):
         if not password_valid:
             return None
 
-        # Invalidate cache on successful auth (in case profile was updated)
+        # Invalidate cache on successful auth
         cache.delete(f"auth_backend:user:{profile.user_id}")
         return self._build_user(profile)
 
@@ -75,7 +85,6 @@ class UsersProfileAuthBackend(BaseBackend):
         """Fetch user with simple caching to avoid redundant DB hits."""
         cache_key = f"auth_backend:user:{user_id}"
 
-        # Check cache first (stores a lightweight marker, not the full object)
         cached_id = cache.get(cache_key)
         if cached_id is not None:
             try:
