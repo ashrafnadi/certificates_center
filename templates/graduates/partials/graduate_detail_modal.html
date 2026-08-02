@@ -22,176 +22,182 @@
       <div class="modal-body p-0">
         {% if selected_graduate %}
           <div class="container-fluid p-3">
-            <!-- Personal Info Card -->
-            <div class="card mb-3 border-0 shadow-sm">
-              <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-person card-header-icon text-primary"></i>البيانات الشخصية</h6>
-              </div>
-              <div class="card-body">
-                <div class="row g-3">
-                  <div class="col-md-3 text-center">
-                    <img src="/uploads/graduates_photos/{{ selected_graduate.graduate_id }}.jpg"
-                         onerror="this.src='{% static "img/no-photo.png" %}'"
-                         alt="{{ selected_graduate.graduate_ar_name }}"
-                         class="graduate-photo border shadow-sm" />
-                    <div class="mt-2">
-                      <span class="badge bg-secondary">#{{ selected_graduate.graduate_id }}</span>
-                    </div>
+            <!-- Two-column layout: LEFT = Academic + Status, RIGHT = Personal Info -->
+            <div class="row g-3">
+              <!-- LEFT COLUMN: Academic Info + Status (horizontal, as-is) -->
+              <div class="col-md-9 order-md-2 order-1">
+                <!-- Academic Info Card — HORIZONTAL LAYOUT (as-is) -->
+                <div class="card mb-3 border-0 shadow-sm">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-mortarboard card-header-icon text-success"></i>البيانات الأكاديمية</h6>
                   </div>
-                  <div class="col-md-9">
-                    <div class="row g-2">
-                      <div class="col-md-6">
-                        <label class="text-muted small">الاسم بالعربية</label>
-                        <p class="fw-bold mb-1">{{ selected_graduate.graduate_ar_name|default:"—" }}</p>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-md-3">
+                        <label class="text-muted small">الكلية</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.faculty.faculty_ar_name|default:"—" }}</p>
                       </div>
                       <div class="col-md-3">
-                        <label class="text-muted small">رقم البطاقة</label>
+                        <label class="text-muted small">الدرجة العلمية</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.regulation.degree.degree_ar_name|default:"—" }}</p>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="text-muted small">القسم</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.specialization.section.section_ar_name|default:"—" }}</p>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="text-muted small">التخصص</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.specialization.specialization_ar_name|default:"—" }}</p>
+                      </div>
+                      
+                      <div class="col-md-3">
+                        <label class="text-muted small">اللائحة</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.regulation.regulation_ar_name|default:"—" }}</p>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="text-muted small">الدور</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.faculty_turn.turn_ar_name|default:"—" }}</p>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="text-muted small">السنة</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.faculty_turn.turn_year|default:"—" }}</p>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="text-muted small">التقدير (ع)</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.grade_name_ar|default:"—" }}</p>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="text-muted small">الحرف</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.grade_letter|default:"—" }}</p>
+                      </div>
+                      <div class="col-md-3">
+                        <label class="text-muted small">الدرجة / المجموع</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.score|default:"—" }}</p>
+                      </div>
+                                            <div class="col-md-3">
+                        <label class="text-muted small">المجموع الكلي</label>
                         <p class="fw-bold mb-1">
-                          {{ selected_graduate.graduate_id_card|default:"—" }}
-                          {% if selected_graduate.ic_card_init %}
-                            - {{ selected_graduate.ic_card_init|default:"—" }}
+                          {% if selected_graduate.specialization.total_score is not None %}
+                            {{ selected_graduate.specialization.total_score }}
+                          {% else %}
+                            <span class="text-muted">—</span>
+                          {% endif %}
+                        </p>
+                      </div>
+
+                      <div class="col-md-3">
+                        <label class="text-muted small">الشرف</label>
+                        <p class="fw-bold mb-1">
+                          {% if selected_graduate.honor == 1 %}
+                            <span class="badge bg-warning text-dark">مع مرتبة الشرف</span>
+                          {% else %}
+                            <span class="badge bg-secondary">بدون</span>
+                          {% endif %}
+                        </p>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="text-muted small">موضوع المشروع (ع)</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.project_data_ar|default:"—" }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Status Card — HORIZONTAL LAYOUT (as-is) -->
+                <div class="card mb-3 border-0 shadow-sm">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-shield-check card-header-icon text-warning"></i>حالة التحقق</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-md-3">
+                        <label class="text-muted small">التحقق 1</label>
+                        <p class="fw-bold mb-1">
+                          {% if selected_graduate.is_checked %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle card-header-icon"></i>تم</span>
+                          {% else %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle card-header-icon"></i>لم يتم</span>
                           {% endif %}
                         </p>
                       </div>
                       <div class="col-md-3">
-                        <label class="text-muted small">تاريخ الميلاد</label>
-                        <p class="fw-bold mb-1">{{ selected_graduate.graduate_dob|date:"Y-m-d"|default:"—" }}</p>
+                        <label class="text-muted small">التحقق 2</label>
+                        <p class="fw-bold mb-1">
+                          {% if selected_graduate.is_checked2 %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle card-header-icon"></i>تم</span>
+                          {% else %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle card-header-icon"></i>لم يتم</span>
+                          {% endif %}
+                        </p>
                       </div>
-                      <div class="col-md-4">
-                        <label class="text-muted small">الجنسية</label>
-                        <p class="fw-bold mb-1">{{ selected_graduate.nationality.nationality_ar_name|default:"—" }}</p>
+                      <div class="col-md-3">
+                        <label class="text-muted small">الحذف</label>
+                        <p class="fw-bold mb-1">
+                          {% if selected_graduate.is_deleted %}
+                            <span class="badge bg-danger">محذوف</span>
+                          {% else %}
+                            <span class="badge bg-success">غير محذوف</span>
+                          {% endif %}
+                        </p>
                       </div>
-                      <div class="col-md-4">
-                        <label class="text-muted small">مكان الميلاد</label>
-                        <p class="fw-bold mb-1">{{ selected_graduate.graduate_ar_pob|default:"—" }}</p>
+                      <div class="col-md-3">
+                        <label class="text-muted small">العملية</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.transdesciption|default:"—" }}</p>
                       </div>
-                      <div class="col-md-4">
-                        <label class="text-muted small">النوع</label>
-                        <p class="fw-bold mb-1">{% if selected_graduate.graduate_gendar == 1 %}ذكر{% else %}أنثى{% endif %}</p>
+                      <div class="col-md-12">
+                        <label class="text-muted small">ملاحظات</label>
+                        <p class="fw-bold mb-1">{{ selected_graduate.graduate_notes|default:"—" }}</p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <!-- Academic Info Card -->
-            <div class="card mb-3 border-0 shadow-sm">
-              <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-mortarboard card-header-icon text-success"></i>البيانات الأكاديمية</h6>
-              </div>
-              <div class="card-body">
-                <div class="row g-3">
-                  <div class="col-md-3">
-                    <label class="text-muted small">الكلية</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.faculty.faculty_ar_name|default:"—" }}</p>
+              <!-- RIGHT COLUMN: Personal Info (vertical, aligned right) -->
+              <div class="col-md-3 order-md-1 order-2">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-person card-header-icon text-primary"></i>البيانات الشخصية</h6>
                   </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">القسم</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.specialization.section.section_ar_name|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">التخصص</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.specialization.specialization_ar_name|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">الدرجة العلمية</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.regulation.degree.degree_ar_name|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">اللائحة</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.regulation.regulation_ar_name|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">الدور</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.faculty_turn.turn_ar_name|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">السنة</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.faculty_turn.turn_year|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">المجموع الكلي</label>
-                    <p class="fw-bold mb-1">
-                      {% if selected_graduate.specialization.total_score is not None %}
-                        {{ selected_graduate.specialization.total_score }}
-                      {% else %}
-                        <span class="text-muted">—</span>
-                      {% endif %}
-                    </p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">التقدير (ع)</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.grade_name_ar|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">الحرف</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.grade_letter|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">الدرجة / المجموع</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.score|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">الشرف</label>
-                    <p class="fw-bold mb-1">
-                      {% if selected_graduate.honor == 1 %}
-                        <span class="badge bg-warning text-dark">مع مرتبة الشرف</span>
-                      {% else %}
-                        <span class="badge bg-secondary">بدون</span>
-                      {% endif %}
-                    </p>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="text-muted small">موضوع المشروع (ع)</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.project_data_ar|default:"—" }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Status Card -->
-            <div class="card mb-3 border-0 shadow-sm">
-              <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-shield-check card-header-icon text-warning"></i>حالة التحقق</h6>
-              </div>
-              <div class="card-body">
-                <div class="row g-3">
-                  <div class="col-md-3">
-                    <label class="text-muted small">التحقق 1</label>
-                    <p class="fw-bold mb-1">
-                      {% if selected_graduate.is_checked %}
-                        <span class="badge bg-success"><i class="bi bi-check-circle card-header-icon"></i>تم</span>
-                      {% else %}
-                        <span class="badge bg-danger"><i class="bi bi-x-circle card-header-icon"></i>لم يتم</span>
-                      {% endif %}
-                    </p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">التحقق 2</label>
-                    <p class="fw-bold mb-1">
-                      {% if selected_graduate.is_checked2 %}
-                        <span class="badge bg-success"><i class="bi bi-check-circle card-header-icon"></i>تم</span>
-                      {% else %}
-                        <span class="badge bg-danger"><i class="bi bi-x-circle card-header-icon"></i>لم يتم</span>
-                      {% endif %}
-                    </p>
-                  </div>
-                  <div class="col-md-3">
-                    <label class="text-muted small">الحذف</label>
-                    <p class="fw-bold mb-1">
-                      {% if selected_graduate.is_deleted %}
-                        <span class="badge bg-danger">محذوف</span>
-                      {% else %}
-                        <span class="badge bg-success">غير محذوف</span>
-                      {% endif %}
-                    </p>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="text-muted small">العملية</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.transdesciption|default:"—" }}</p>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="text-muted small">ملاحظات</label>
-                    <p class="fw-bold mb-1">{{ selected_graduate.graduate_notes|default:"—" }}</p>
+                  <div class="card-body text-center">
+                    <!-- Photo centered -->
+                    <img src="/uploads/graduates_photos/{{ selected_graduate.graduate_id }}.jpg"
+                         onerror="this.src='{% static "img/no-photo.png" %}'"
+                         alt="{{ selected_graduate.graduate_ar_name }}"
+                         class="graduate-photo border shadow-sm mb-2" />
+                    <div class="mb-3">
+                      <span class="badge bg-secondary">#{{ selected_graduate.graduate_id }}</span>
+                    </div>
+                    <!-- Vertical info fields -->
+                    <div class="text-start">
+                      <div class="mb-2">
+                        <label class="text-muted small d-block">الاسم بالعربية</label>
+                        <p class="fw-bold mb-0">{{ selected_graduate.graduate_ar_name|default:"—" }}</p>
+                      </div>
+                      <div class="mb-2">
+                        <label class="text-muted small d-block">رقم البطاقة</label>
+                        <p class="fw-bold mb-0">
+                          {{ selected_graduate.graduate_id_card|default:"—" }}
+                          {% if selected_graduate.ic_card_init %}
+                            <span class="text-muted">- {{ selected_graduate.ic_card_init }}</span>
+                          {% endif %}
+                        </p>
+                      </div>
+                      <div class="mb-2">
+                        <label class="text-muted small d-block">تاريخ الميلاد</label>
+                        <p class="fw-bold mb-0">{{ selected_graduate.graduate_dob|date:"Y-m-d"|default:"—" }}</p>
+                      </div>
+                      <div class="mb-2">
+                        <label class="text-muted small d-block">الجنسية</label>
+                        <p class="fw-bold mb-0">{{ selected_graduate.nationality.nationality_ar_name|default:"—" }}</p>
+                      </div>
+                      <div class="mb-2">
+                        <label class="text-muted small d-block">مكان الميلاد</label>
+                        <p class="fw-bold mb-0">{{ selected_graduate.graduate_ar_pob|default:"—" }}</p>
+                      </div>
+                      <div class="mb-0">
+                        <label class="text-muted small d-block">النوع</label>
+                        <p class="fw-bold mb-0">{% if selected_graduate.graduate_gendar == 1 %}ذكر{% else %}أنثى{% endif %}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -204,7 +210,7 @@
           </div>
         {% endif %}
       </div>
-      <div class="modal-footer bg-light">
+      <div class="modal-footer">
         <button type="button"
                 class="btn btn-secondary"
                 data-bs-dismiss="modal"
