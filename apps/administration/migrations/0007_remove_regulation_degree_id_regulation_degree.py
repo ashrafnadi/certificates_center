@@ -5,19 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('administration', '0006_alter_section_section_ar_namr_and_more'),
+        ("administration", "0006_alter_section_section_ar_namr_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='regulation',
-            name='degree_id',
+            model_name="regulation",
+            name="degree_id",
         ),
         migrations.AddField(
-            model_name='regulation',
-            name='degree',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.degree'),
+            model_name="regulation",
+            name="degree",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.degree",
+            ),
         ),
     ]

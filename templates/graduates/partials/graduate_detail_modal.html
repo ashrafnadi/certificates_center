@@ -49,7 +49,6 @@
                         <label class="text-muted small">التخصص</label>
                         <p class="fw-bold mb-1">{{ selected_graduate.specialization.specialization_ar_name|default:"—" }}</p>
                       </div>
-                      
                       <div class="col-md-3">
                         <label class="text-muted small">اللائحة</label>
                         <p class="fw-bold mb-1">{{ selected_graduate.regulation.regulation_ar_name|default:"—" }}</p>
@@ -64,7 +63,7 @@
                       </div>
                       <div class="col-md-3">
                         <label class="text-muted small">التقدير (ع)</label>
-                        <p class="fw-bold mb-1">{{ selected_graduate.grade_name_ar|default:"—" }}</p>
+                        <p class="fw-bold mb-1">{{ selected_graduate.computed_grade_ar|default:"—" }}</p>
                       </div>
                       <div class="col-md-3">
                         <label class="text-muted small">الحرف</label>
@@ -72,11 +71,8 @@
                       </div>
                       <div class="col-md-3">
                         <label class="text-muted small">الدرجة / المجموع</label>
-                        <p class="fw-bold mb-1">{{ selected_graduate.score|default:"—" }}</p>
-                      </div>
-                                            <div class="col-md-3">
-                        <label class="text-muted small">المجموع الكلي</label>
                         <p class="fw-bold mb-1">
+                          {{ selected_graduate.score|default:"—" }}/
                           {% if selected_graduate.specialization.total_score is not None %}
                             {{ selected_graduate.specialization.total_score }}
                           {% else %}
@@ -84,7 +80,6 @@
                           {% endif %}
                         </p>
                       </div>
-
                       <div class="col-md-3">
                         <label class="text-muted small">الشرف</label>
                         <p class="fw-bold mb-1">
@@ -96,7 +91,7 @@
                         </p>
                       </div>
                       <div class="col-md-6">
-                        <label class="text-muted small">موضوع المشروع (ع)</label>
+                        <label class="text-muted small">موضوع المشروع</label>
                         <p class="fw-bold mb-1">{{ selected_graduate.project_data_ar|default:"—" }}</p>
                       </div>
                     </div>

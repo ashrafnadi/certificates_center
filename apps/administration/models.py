@@ -274,8 +274,10 @@ class Regulation(models.Model):
 
 class Regulation_Grade(models.Model):
     regulation_grade_id = models.BigIntegerField(primary_key=True)
-    regulation_id = models.BigIntegerField()
-    grade_id = models.BigIntegerField()
+    regulation = models.ForeignKey(
+        Regulation, on_delete=models.CASCADE, blank=True, null=True
+    )
+    grade = models.ForeignKey(Grade, on_delete=models.CASCADE, blank=True, null=True)
     grade_start = models.SmallIntegerField()
     grade_end = models.SmallIntegerField()
 

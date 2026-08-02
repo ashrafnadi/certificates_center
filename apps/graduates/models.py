@@ -6,6 +6,7 @@ from apps.administration.models import (
     Specialization,
     Regulation,
     Transaction,
+    Regulation_Grade,
 )
 
 
@@ -168,6 +169,63 @@ class Graduate(models.Model):
     @is_deleted.setter
     def is_deleted(self, value):
         self.isdelete = "Y" if value else "N"
+
+    @property
+    def computed_grade(self):
+        """
+        Compute grade from Regulation_Grade ranges.
+        Score is total points → convert to percentage before matching.
+        Falls back to stored grade_name_ar if available.
+        """
+        # 1. Return stored value if available
+        if self.grade_name_ar:
+            return {
+                "ar": self.grade_name_ar,
+                "en": self.grade_name_en,
+                "letter": self.grade_letter,
+            }
+
+        # 2. Need regulation_id, score, and total_score to compute
+        if not self.regulation_id or self.score is None:
+            return {"ar": None, "en": None, "letter": self.grade_letter}
+
+        try:
+            # Convert total score to percentage
+            if self.specialization and self.specialization.total_score:
+                pct = (float(self.score) / self.specialization.total_score) * 100
+            else:
+                # Fallback: try raw score if no total_score available
+                pct = float(self.score)
+
+            rg = (
+                Regulation_Grade.objects.filter(
+                    regulation__regulation_id=self.regulation_id,
+                    grade_start__lte=pct,
+                    grade_end__gte=pct,
+                )
+                .select_related("grade")
+                .first()
+            )
+
+            if rg and rg.grade:
+                return {
+                    "ar": rg.grade.grade_ar_name,
+                    "en": rg.grade.grade_en_name,
+                    "letter": self.grade_letter,
+                }
+
+        except Exception:
+            pass
+
+        return {"ar": None, "en": None, "letter": self.grade_letter}
+
+    @property
+    def computed_grade_ar(self):
+        return self.computed_grade.get("ar")
+
+    @property
+    def computed_grade_en(self):
+        return self.computed_grade.get("en")
 
 
 class History(models.Model):

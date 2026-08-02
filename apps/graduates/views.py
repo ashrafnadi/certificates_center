@@ -308,7 +308,7 @@ def graduate_list(request):
                     "specialization",
                     "faculty_turn",
                     "regulation",
-                    "regulation__degree",  # ← FIX: fetch degree via regulation
+                    "regulation__degree",
                 ),
                 graduate_id=int(graduate_id),
             )

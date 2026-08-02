@@ -5,15 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('administration', '0007_remove_regulation_degree_id_regulation_degree'),
+        ("administration", "0007_remove_regulation_degree_id_regulation_degree"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='regulation',
-            name='degree',
-            field=models.ForeignKey(blank=True, db_column='degree', null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.degree'),
+            model_name="regulation",
+            name="degree",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="degree",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.degree",
+            ),
         ),
     ]
