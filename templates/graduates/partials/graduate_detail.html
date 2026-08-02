@@ -1,68 +1,107 @@
 {% load static %}
 {% if selected_graduate %}
-<div class="card border-0 shadow-sm">
-    <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">
-            <i class="bi bi-person-vcard me-2 text-primary"></i>بيانات الخريج
-        </h5>
-        <span class="badge bg-primary">{{ selected_graduate.graduate_id }}</span>
-    </div>
-    <div class="card-body">
-        <div class="row g-4">
-            <div class="col-md-3 text-center">
-                <img src="{{ MEDIA_URL }}uploads/graduates/{{ selected_graduate.graduate_id }}.jpg"
-                     alt="{{ selected_graduate.graduate_ar_name }}"
-                     class="detail-photo mb-2"
-                     onerror="this.src='{% static 'images/no-photo.png' %}'">
-                <h6 class="fw-bold">{{ selected_graduate.graduate_ar_name }}</h6>
-                <small class="text-muted">{{ selected_graduate.graduate_en_name }}</small>
-            </div>
-            <div class="col-md-9">
-                <div class="row g-3">
-                    <div class="col-md-4"><label class="text-muted">الكلية</label><p class="fw-semibold mb-0">{{ selected_graduate.faculty.faculty_ar_name|default:'—' }}</p></div>
-                    <div class="col-md-4"><label class="text-muted">التخصص</label><p class="fw-semibold mb-0">{{ selected_graduate.specialization.specialization_ar_name|default:'—' }}</p></div>
-                    <div class="col-md-4"><label class="text-muted">الدورة</label><p class="fw-semibold mb-0">{{ selected_graduate.faculty_turn.turn_ar_name|default:'—' }}</p></div>
-                    <div class="col-md-4"><label class="text-muted">رقم البطاقة</label><p class="fw-semibold mb-0 font-monospace">{{ selected_graduate.graduate_id_card }}</p></div>
-                    <div class="col-md-4"><label class="text-muted">تاريخ الميلاد</label><p class="fw-semibold mb-0">{{ selected_graduate.graduate_dob|date:'Y-m-d'|default:'—' }}</p></div>
-                    <div class="col-md-4"><label class="text-muted">الجنسية</label><p class="fw-semibold mb-0">{{ selected_graduate.nationality.nationality_ar_name|default:'—' }}</p></div>
-                    <div class="col-md-4"><label class="text-muted">الدرجة</label><p class="fw-semibold mb-0">{{ selected_graduate.grade_name_ar|default:'—' }}</p></div>
-                    <div class="col-md-4"><label class="text-muted">التقدير</label><p class="fw-semibold mb-0">{{ selected_graduate.grade_letter|default:'—' }}</p></div>
-                    <div class="col-md-4"><label class="text-muted">المجموع</label><p class="fw-semibold mb-0">{{ selected_graduate.score|default:'—' }}</p></div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-person-vcard me-2 text-primary"></i>بيانات الخريج
+            </h5>
+            <span class="badge bg-primary">{{ selected_graduate.graduate_id }}</span>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-3 text-center">
+                    <img src="{{ MEDIA_URL }}uploads/graduates/{{ selected_graduate.graduate_id }}.jpg"
+                         alt="{{ selected_graduate.graduate_ar_name }}"
+                         class="detail-photo mb-2"
+                         onerror="this.src='{% static 'images/no-photo.png' %}'" />
+                    <h6 class="fw-bold">{{ selected_graduate.graduate_ar_name }}</h6>
+                    <small class="text-muted">{{ selected_graduate.graduate_en_name }}</small>
                 </div>
-                {% if selected_graduate.project_data_ar %}
-                <hr>
-                <h6 class="fw-bold text-success"><i class="bi bi-journal-text me-1"></i>مشروع التخرج</h6>
-                <p class="mb-0">{{ selected_graduate.project_data_ar }}</p>
-                {% endif %}
-                {% if certificates %}
-                <hr>
-                <h6 class="fw-bold text-info"><i class="bi bi-award me-1"></i>الشهادات ({{ certificates|length }})</h6>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light"><tr><th>الرقم التسلسلي</th><th>التاريخ</th><th>الطباعة</th><th>التسليم</th></tr></thead>
-                        <tbody>
-                            {% for cert in certificates %}
-                            <tr>
-                                <td>{{ cert.certificate_serial|default:'—' }}</td>
-                                <td>{{ cert.certificate_date|date:'Y-m-d'|default:'—' }}</td>
-                                <td>{{ cert.print_date|date:'Y-m-d'|default:'—' }}</td>
-                                <td>{% if cert.delivered == '1' or cert.delivered == 'Y' %}<span class="badge bg-success">تم</span>{% else %}<span class="badge bg-warning text-dark">لم يتم</span>{% endif %}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="col-md-9">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="text-muted">الكلية</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.faculty.faculty_ar_name|default:'—' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted">التخصص</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.specialization.specialization_ar_name|default:'—' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted">الدورة</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.faculty_turn.turn_ar_name|default:'—' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted">رقم البطاقة</label>
+                            <p class="fw-semibold mb-0 font-monospace">{{ selected_graduate.graduate_id_card }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted">تاريخ الميلاد</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.graduate_dob|date:'Y-m-d'|default:'—' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted">الجنسية</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.nationality.nationality_ar_name|default:'—' }}</p>
+                        </div>
+                        <!-- FIXED: use degree.degree_ar_name -->
+                        <div class="col-md-4">
+                            <label class="text-muted">الدرجة العلمية</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.regulation.degree.degree_ar_name|default:'—' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted">التقدير</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.grade_letter|default:'—' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted">المجموع</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.score|default:'—' }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted">اللائحة</label>
+                            <p class="fw-semibold mb-0">{{ selected_graduate.regulation.regulation_ar_name|default:'—' }}</p>
+                        </div>
+                    </div>
+                    {% if selected_graduate.project_data_ar %}
+                        <hr />
+                        <h6 class="fw-bold text-success"><i class="bi bi-journal-text me-1"></i>مشروع التخرج</h6>
+                        <p class="mb-0">{{ selected_graduate.project_data_ar }}</p>
+                    {% endif %}
+                    {% if certificates %}
+                        <hr />
+                        <h6 class="fw-bold text-info"><i class="bi bi-award me-1"></i>الشهادات ({{ certificates|length }})</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>الرقم التسلسلي</th>
+                                        <th>التاريخ</th>
+                                        <th>الطباعة</th>
+                                        <th>التسليم</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cert in certificates %}
+                                        <tr>
+                                            <td>{{ cert.certificate_serial|default:'—' }}</td>
+                                            <td>{{ cert.certificate_date|date:'Y-m-d'|default:'—' }}</td>
+                                            <td>{{ cert.print_date|date:'Y-m-d'|default:'—' }}</td>
+                                            <td>{% if cert.delivered == '1' or cert.delivered == 'Y' %}<span class="badge bg-success">تم</span>{% else %}<span class="badge bg-warning text-dark">لم يتم</span>{% endif %}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
-</div>
 {% else %}
-<div class="card border-0 shadow-sm">
-    <div class="card-body text-center text-muted py-5">
-        <i class="bi bi-person-x fs-1 d-block mb-3"></i>
-        <h5>لم يتم اختيار خريج</h5>
-        <p class="mb-0">اختر خريجاً من القائمة لعرض تفاصيله</p>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body text-center text-muted py-5">
+            <i class="bi bi-person-x fs-1 d-block mb-3"></i>
+            <h5>لم يتم اختيار خريج</h5>
+            <p class="mb-0">اختر خريجاً من القائمة لعرض تفاصيله</p>
+        </div>
     </div>
-</div>
 {% endif %}

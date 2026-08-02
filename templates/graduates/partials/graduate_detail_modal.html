@@ -1,149 +1,195 @@
-<!-- Graduate Detail Modal -->
 {% load static %}
-<div class="modal fade"
-     id="graduateDetailModal"
-     tabindex="-1"
-     aria-labelledby="graduateDetailModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold" id="graduateDetailModalLabel">
-                    <i class="bi bi-person-vcard me-2"></i>بيانات الخريج
-                </h5>
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+<div class="modal fade" id="graduateDetailModal" tabindex="-1" aria-labelledby="graduateDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h5 class="modal-title fw-bold" id="graduateDetailModalLabel">
+          <i class="bi bi-person-vcard me-2"></i>بيانات الخريج
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        {% if selected_graduate %}
+        <div class="row g-0">
+          <!-- Photo Column -->
+          <div class="col-md-3 border-start d-flex flex-column align-items-center justify-content-center p-4">
+            <div class="bg-white rounded-3 shadow-sm p-2 mb-3">
+              <img src="{{ MEDIA_URL }}uploads/graduates/{{ selected_graduate.graduate_id }}.jpg"
+                   alt="{{ selected_graduate.graduate_ar_name }}"
+                   class="graduate-photo"
+                   onerror="this.src='{% static 'img/no-photo.png' %}'">
             </div>
-            <div class="modal-body p-0">
-                {% if selected_graduate %}
-                    <div class="row g-0">
-                        <!-- Photo Column -->
-                        <div class="col-md-3 border-start d-flex flex-column align-items-center justify-content-center p-4">
-                            <div class="bg-white rounded-3 shadow-sm p-2 mb-3">
-                                <img src="{{ MEDIA_URL }}uploads/graduates/{{ selected_graduate.graduate_id }}.jpg"
-                                     alt="{{ selected_graduate.graduate_ar_name }}"
-                                     class="graduate-photo"
-                                     onerror="this.src='{% static 'img/no-photo.png' %}'" />
-                            </div>
-                            <h6 class="fw-bold text-center mb-1">{{ selected_graduate.graduate_ar_name }}</h6>
-                            {% comment %} <small class="text-muted text-center">{{ selected_graduate.graduate_en_name }}</small> {% endcomment %}
-                            <div class="mt-3 w-100">
-                                <div class="d-flex justify-content-between border-bottom py-2">
-                                    <span class="text-muted">رقم البطاقة</span>
-                                    <span class="font-monospace fw-semibold">{{ selected_graduate.graduate_id_card }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between border-bottom py-2">
-                                    <span class="text-muted">تاريخ الميلاد</span>
-                                    <span class="fw-semibold">{{ selected_graduate.graduate_dob|date:'Y-m-d'|default:'—' }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between py-2">
-                                    <span class="text-muted">الجنس</span>
-                                    <span class="fw-semibold">
-                                        {% if selected_graduate.graduate_gendar == 1 %}ذكر{% elif selected_graduate.graduate_gendar == 2 %}أنثى{% else %}—{% endif %}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Details Column -->
-                        <div class="col-md-9">
-                            <div class="p-4">
-                                <!-- Academic Info -->
-                                <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
-                                    <i class="bi bi-mortarboard me-1"></i>البيانات الأكاديمية
-                                </h6>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
-                                        <label class="text-muted">الكلية</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.faculty.faculty_ar_name|default:'—' }}</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="text-muted">التخصص</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.specialization.specialization_ar_name|default:'—' }}</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="text-muted">الدورة</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.faculty_turn.turn_ar_name|default:'—' }}</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="text-muted">الدرجة العلمية</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.regulation.degree|default:'—' }}</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="text-muted">التقدير</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.grade.grade_name_ar|default:'—' }} - {{ selected_graduate.grade_letter|default:'—' }}</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="text-muted">المجموع</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.score|default:'—' }}</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="text-muted">اللائحة</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.regulation.regulation_ar_name|default:'—' }}</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="text-muted">الجنسية</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.nationality.nationality_ar_name|default:'—' }}</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="text-muted">مكان الميلاد</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.graduate_ar_pob|default:'—' }}</p>
-                                    </div>
-                                </div>
-                                <!-- Project Info -->
-                                {% if selected_graduate.project_data_ar %}
-                                    <h6 class="fw-bold text-success mb-3 border-bottom pb-2">
-                                        <i class="bi bi-journal-text me-1"></i>مشروع التخرج
-                                    </h6>
-                                    <div class="row g-3 mb-4">
-                                        <div class="col-12">
-                                            <label class="text-muted">عنوان المشروع (عربي)</label>
-                                            <p class="fw-semibold mb-0">{{ selected_graduate.project_data_ar }}</p>
-                                        </div>
-                                        {% if selected_graduate.project_data_en %}
-                                            <div class="col-12">
-                                                <label class="text-muted">عنوان المشروع (English)</label>
-                                                <p class="fw-semibold mb-0">{{ selected_graduate.project_data_en }}</p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                {% endif %}
-                                <!-- Notes -->
-                                {% if selected_graduate.graduate_notes %}
-                                    <div class="alert alert-warning mt-3 mb-0">
-                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                        <strong>ملاحظات:</strong> {{ selected_graduate.graduate_notes }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="text-center text-muted py-5">
-                        <i class="bi bi-person-x fs-1 d-block mb-3"></i>
-                        <h5>لم يتم العثور على بيانات الخريج</h5>
-                    </div>
+            <h6 class="fw-bold text-center mb-1">{{ selected_graduate.graduate_ar_name }}</h6>
+            <small class="text-muted text-center">{{ selected_graduate.graduate_en_name }}</small>
+            <div class="mt-3 w-100">
+              <div class="d-flex justify-content-between border-bottom py-2">
+                <span class="text-muted">رقم البطاقة</span>
+                <span class="font-monospace fw-semibold">{{ selected_graduate.graduate_id_card }}</span>
+              </div>
+              <div class="d-flex justify-content-between border-bottom py-2">
+                <span class="text-muted">تاريخ الميلاد</span>
+                <span class="fw-semibold">{{ selected_graduate.graduate_dob|date:'Y-m-d'|default:'—' }}</span>
+              </div>
+              <div class="d-flex justify-content-between py-2">
+                <span class="text-muted">الجنس</span>
+                <span class="fw-semibold">
+                  {% if selected_graduate.graduate_gendar == 1 %}ذكر{% elif selected_graduate.graduate_gendar == 2 %}أنثى{% else %}—{% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- Details Column -->
+          <div class="col-md-9">
+            <div class="p-4">
+              <!-- Academic Info -->
+              <h6 class="fw-bold text-primary mb-3 border-bottom pb-2">
+                <i class="bi bi-mortarboard me-1"></i>البيانات الأكاديمية
+              </h6>
+              <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                  <label class="text-muted">الكلية</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.faculty.faculty_ar_name|default:'—' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="text-muted">التخصص</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.specialization.specialization_ar_name|default:'—' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="text-muted">الدورة</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.faculty_turn.turn_ar_name|default:'—' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="text-muted">الدرجة العلمية</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.grade_name_ar|default:'—' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="text-muted">التقدير</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.grade_letter|default:'—' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="text-muted">المجموع</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.score|default:'—' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="text-muted">اللائحة</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.regulation.regulation_ar_name|default:'—' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="text-muted">الجنسية</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.nationality.nationality_ar_name|default:'—' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <label class="text-muted">مكان الميلاد</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.graduate_ar_pob|default:'—' }}</p>
+                </div>
+              </div>
+
+              <!-- Project Info -->
+              {% if selected_graduate.project_data_ar %}
+              <h6 class="fw-bold text-success mb-3 border-bottom pb-2">
+                <i class="bi bi-journal-text me-1"></i>مشروع التخرج
+              </h6>
+              <div class="row g-3 mb-4">
+                <div class="col-12">
+                  <label class="text-muted">عنوان المشروع (عربي)</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.project_data_ar }}</p>
+                </div>
+                {% if selected_graduate.project_data_en %}
+                <div class="col-12">
+                  <label class="text-muted">عنوان المشروع (English)</label>
+                  <p class="fw-semibold mb-0">{{ selected_graduate.project_data_en }}</p>
+                </div>
                 {% endif %}
+              </div>
+              {% endif %}
+
+              <!-- Certificates -->
+              <h6 class="fw-bold text-info mb-3 border-bottom pb-2">
+                <i class="bi bi-award me-1"></i>الشهادات
+              </h6>
+              {% if certificates %}
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>الرقم التسلسلي</th>
+                      <th>التاريخ</th>
+                      <th>تاريخ الطباعة</th>
+                      <th>التسليم</th>
+                      <th>الحالة</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for cert in certificates %}
+                    <tr>
+                      <td class="font-monospace">{{ cert.certificate_serial|default:'—' }}</td>
+                      <td>{{ cert.certificate_date|date:'Y-m-d'|default:'—' }}</td>
+                      <td>{{ cert.print_date|date:'Y-m-d'|default:'—' }}</td>
+                      <td>
+                        {% if cert.delivered == '1' or cert.delivered == 'Y' %}
+                          <span class="badge bg-success">تم التسليم</span>
+                          <small class="text-muted d-block">{{ cert.delivered_date|date:'Y-m-d'|default:'' }}</small>
+                        {% else %}
+                          <span class="badge bg-warning text-dark">لم يتم التسليم</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if cert.certificate_status == '1' %}
+                          <span class="badge bg-success">فعالة</span>
+                        {% else %}
+                          <span class="badge bg-secondary">غير فعالة</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <p class="text-muted">لا توجد شهادات مسجلة لهذا الخريج.</p>
+              {% endif %}
+
+              <!-- Notes -->
+              {% if selected_graduate.graduate_notes %}
+              <div class="alert alert-warning mt-3 mb-0">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>ملاحظات:</strong> {{ selected_graduate.graduate_notes }}
+              </div>
+              {% endif %}
             </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg me-1"></i>إغلاق
-                </button>
-            </div>
+          </div>
         </div>
+        {% else %}
+        <div class="text-center text-muted py-5">
+          <i class="bi bi-person-x fs-1 d-block mb-3"></i>
+          <h5>لم يتم العثور على بيانات الخريج</h5>
+        </div>
+        {% endif %}
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg me-1"></i>إغلاق
+        </button>
+        {% if selected_graduate %}
+        <a href="{% url 'graduates:graduate_list' %}?graduate_id={{ selected_graduate.graduate_id }}&specialization_id={{ selected_specialization_id }}&section_id={{ selected_section_id }}&faculty_id={{ selected_faculty.faculty_id|default:selected_faculty_id }}"
+           class="btn btn-primary">
+          <i class="bi bi-printer me-1"></i>طباعة
+        </a>
+        {% endif %}
+      </div>
     </div>
+  </div>
 </div>
 <script>
-    (function() {
-        var modalEl = document.getElementById('graduateDetailModal');
-        if (modalEl) {
-            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
-            modalEl.addEventListener('hidden.bs.modal', function() {
-                var container = document.getElementById('modalContainer');
-                if (container) container.innerHTML = '';
-            });
-        }
-    })();
+  (function() {
+    var modalEl = document.getElementById('graduateDetailModal');
+    if (modalEl) {
+      var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+      modalEl.addEventListener('hidden.bs.modal', function () {
+        var container = document.getElementById('modalContainer');
+        if (container) container.innerHTML = '';
+      });
+    }
+  })();
 </script>

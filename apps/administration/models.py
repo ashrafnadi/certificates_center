@@ -55,7 +55,7 @@ class Degree(models.Model):
         ordering = ("degree_id",)
 
     def __str__(self):
-        return str(self.degree_id)
+        return str(self.degree_ar_name)
 
 
 class Faculty(models.Model):
