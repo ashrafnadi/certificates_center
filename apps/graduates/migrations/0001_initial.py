@@ -4,81 +4,115 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='certificate',
+            name="certificate",
             fields=[
-                ('certificate_id', models.BigIntegerField(primary_key=True, serialize=False)),
-                ('certificate_serial', models.CharField(max_length=20)),
-                ('certificate_date', models.DateTimeField()),
-                ('certificate_status', models.CharField(max_length=2)),
-                ('graduate_id', models.BigIntegerField(blank=True, null=True)),
-                ('print_date', models.DateTimeField(blank=True, null=True)),
-                ('delivered', models.CharField(blank=True, max_length=2, null=True)),
-                ('delivered_date', models.DateTimeField(blank=True, null=True)),
-                ('certificate_notes', models.CharField(blank=True, max_length=200, null=True)),
+                (
+                    "certificate_id",
+                    models.BigIntegerField(primary_key=True, serialize=False),
+                ),
+                ("certificate_serial", models.CharField(max_length=20)),
+                ("certificate_date", models.DateTimeField()),
+                ("certificate_status", models.CharField(max_length=2)),
+                ("graduate_id", models.BigIntegerField(blank=True, null=True)),
+                ("print_date", models.DateTimeField(blank=True, null=True)),
+                ("delivered", models.CharField(blank=True, max_length=2, null=True)),
+                ("delivered_date", models.DateTimeField(blank=True, null=True)),
+                (
+                    "certificate_notes",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
             ],
             options={
-                'ordering': ('certificate_id',),
+                "ordering": ("certificate_id",),
             },
         ),
         migrations.CreateModel(
-            name='faculty_turn',
+            name="faculty_turn",
             fields=[
-                ('faculty_turn_id', models.BigIntegerField(primary_key=True, serialize=False)),
-                ('faculty_id', models.BigIntegerField()),
-                ('turn_ar_name', models.CharField(max_length=30)),
-                ('turn_en_name', models.CharField(max_length=30)),
-                ('turn_cad_date', models.DateTimeField()),
-                ('turn_uad_date', models.DateTimeField()),
-                ('turn_year', models.CharField(max_length=20)),
-                ('turn_cad_no', models.CharField(blank=True, max_length=20, null=True)),
-                ('turn_uad_no', models.CharField(blank=True, max_length=20, null=True)),
+                (
+                    "faculty_turn_id",
+                    models.BigIntegerField(primary_key=True, serialize=False),
+                ),
+                ("faculty_id", models.BigIntegerField()),
+                ("turn_ar_name", models.CharField(max_length=30)),
+                ("turn_en_name", models.CharField(max_length=30)),
+                ("turn_cad_date", models.DateTimeField()),
+                ("turn_uad_date", models.DateTimeField()),
+                ("turn_year", models.CharField(max_length=20)),
+                ("turn_cad_no", models.CharField(blank=True, max_length=20, null=True)),
+                ("turn_uad_no", models.CharField(blank=True, max_length=20, null=True)),
             ],
             options={
-                'ordering': ('faculty_turn_id',),
+                "ordering": ("faculty_turn_id",),
             },
         ),
         migrations.CreateModel(
-            name='graduate',
+            name="graduate",
             fields=[
-                ('graduate_id', models.BigIntegerField(primary_key=True, serialize=False)),
-                ('graduate_id_card', models.DecimalField(decimal_places=0, max_digits=20)),
-                ('graduate_ar_name', models.CharField(max_length=400)),
-                ('graduate_en_name', models.CharField(max_length=400)),
-                ('graduate_ar_pob', models.CharField(max_length=100)),
-                ('graduate_en_pob', models.CharField(max_length=100)),
-                ('graduate_dob', models.DateTimeField()),
-                ('nationality_id', models.BigIntegerField()),
-                ('graduate_gendar', models.SmallIntegerField()),
-                ('graduate_notes', models.CharField(blank=True, max_length=200, null=True)),
-                ('score', models.DecimalField(decimal_places=3, max_digits=9)),
-                ('project_data_ar', models.CharField(blank=True, max_length=200, null=True)),
-                ('project_data_en', models.CharField(blank=True, max_length=200, null=True)),
-                ('honor', models.SmallIntegerField()),
-                ('grade_name_ar', models.CharField(blank=True, max_length=50, null=True)),
-                ('grade_letter', models.CharField(blank=True, max_length=20, null=True)),
-                ('grade_name_en', models.CharField(blank=True, max_length=50, null=True)),
-                ('ischeked', models.CharField(max_length=2)),
-                ('ischeked2', models.CharField(max_length=20)),
-                ('specialization_id', models.BigIntegerField()),
-                ('faculty_turn_id', models.BigIntegerField()),
-                ('regulation_id', models.BigIntegerField()),
-                ('isdelete', models.CharField(blank=True, max_length=2, null=True)),
-                ('transaction_id', models.BigIntegerField()),
-                ('lastuser', models.BigIntegerField()),
-                ('transdesciption', models.CharField(max_length=200)),
-                ('faculty_id', models.BigIntegerField(blank=True, null=True)),
-                ('ic_card_init', models.CharField(blank=True, max_length=20, null=True)),
+                (
+                    "graduate_id",
+                    models.BigIntegerField(primary_key=True, serialize=False),
+                ),
+                (
+                    "graduate_id_card",
+                    models.DecimalField(decimal_places=0, max_digits=20),
+                ),
+                ("graduate_ar_name", models.CharField(max_length=400)),
+                ("graduate_en_name", models.CharField(max_length=400)),
+                ("graduate_ar_pob", models.CharField(max_length=100)),
+                ("graduate_en_pob", models.CharField(max_length=100)),
+                ("graduate_dob", models.DateTimeField()),
+                ("nationality_id", models.BigIntegerField()),
+                ("graduate_gendar", models.SmallIntegerField()),
+                (
+                    "graduate_notes",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                ("score", models.DecimalField(decimal_places=3, max_digits=9)),
+                (
+                    "project_data_ar",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                (
+                    "project_data_en",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                ("honor", models.SmallIntegerField()),
+                (
+                    "grade_name_ar",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                (
+                    "grade_letter",
+                    models.CharField(blank=True, max_length=20, null=True),
+                ),
+                (
+                    "grade_name_en",
+                    models.CharField(blank=True, max_length=50, null=True),
+                ),
+                ("ischeked", models.CharField(max_length=2)),
+                ("ischeked2", models.CharField(max_length=20)),
+                ("specialization_id", models.BigIntegerField()),
+                ("faculty_turn_id", models.BigIntegerField()),
+                ("regulation_id", models.BigIntegerField()),
+                ("isdelete", models.CharField(blank=True, max_length=2, null=True)),
+                ("transaction_id", models.BigIntegerField()),
+                ("lastuser", models.BigIntegerField()),
+                ("transdesciption", models.CharField(max_length=200)),
+                ("faculty_id", models.BigIntegerField(blank=True, null=True)),
+                (
+                    "ic_card_init",
+                    models.CharField(blank=True, max_length=20, null=True),
+                ),
             ],
             options={
-                'ordering': ('graduate_id',),
+                "ordering": ("graduate_id",),
             },
         ),
     ]

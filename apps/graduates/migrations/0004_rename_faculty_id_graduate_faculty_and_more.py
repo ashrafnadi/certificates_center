@@ -4,45 +4,44 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('graduates', '0003_alter_faculty_turn_faculty_id_and_more'),
+        ("graduates", "0003_alter_faculty_turn_faculty_id_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='graduate',
-            old_name='faculty_id',
-            new_name='faculty',
+            model_name="graduate",
+            old_name="faculty_id",
+            new_name="faculty",
         ),
         migrations.RenameField(
-            model_name='graduate',
-            old_name='faculty_turn_id',
-            new_name='faculty_turn',
+            model_name="graduate",
+            old_name="faculty_turn_id",
+            new_name="faculty_turn",
         ),
         migrations.RenameField(
-            model_name='graduate',
-            old_name='nationality_id',
-            new_name='nationality',
+            model_name="graduate",
+            old_name="nationality_id",
+            new_name="nationality",
         ),
         migrations.RenameField(
-            model_name='graduate',
-            old_name='regulation_id',
-            new_name='regulation',
+            model_name="graduate",
+            old_name="regulation_id",
+            new_name="regulation",
         ),
         migrations.RenameField(
-            model_name='graduate',
-            old_name='specialization_id',
-            new_name='specialization',
+            model_name="graduate",
+            old_name="specialization_id",
+            new_name="specialization",
         ),
         migrations.RenameField(
-            model_name='graduate',
-            old_name='transaction_id',
-            new_name='transaction',
+            model_name="graduate",
+            old_name="transaction_id",
+            new_name="transaction",
         ),
         migrations.RenameField(
-            model_name='history',
-            old_name='faculty_id',
-            new_name='faculty',
+            model_name="history",
+            old_name="faculty_id",
+            new_name="faculty",
         ),
     ]

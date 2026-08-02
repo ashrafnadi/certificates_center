@@ -5,24 +5,31 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('administration', '0003_rename_data_system_settings_delete_authorize_user_and_more'),
+        (
+            "administration",
+            "0003_rename_data_system_settings_delete_authorize_user_and_more",
+        ),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='transaction',
-            old_name='faculty_id',
-            new_name='faculty',
+            model_name="transaction",
+            old_name="faculty_id",
+            new_name="faculty",
         ),
         migrations.RemoveField(
-            model_name='transaction',
-            name='user_id',
+            model_name="transaction",
+            name="user_id",
         ),
         migrations.AddField(
-            model_name='transaction',
-            name='user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.users_profile'),
+            model_name="transaction",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.users_profile",
+            ),
         ),
     ]

@@ -10,7 +10,6 @@ def application_info(request):
     }
 
 
-
 def global_context(request):
     return {
         "APPLICATION_NAME": getattr(settings, "APPLICATION_NAME", "Certificate Center"),

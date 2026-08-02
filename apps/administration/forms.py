@@ -6,29 +6,33 @@ from .models import Faculty
 class LoginForm(forms.Form):
     username = forms.CharField(
         max_length=60,
-        label='اسم المستخدم',
-        widget=forms.TextInput(attrs={
-            'placeholder': 'أدخل اسم المستخدم',
-            'class': 'input input-bordered w-full'
-        })
+        label="اسم المستخدم",
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "أدخل اسم المستخدم",
+                "class": "input input-bordered w-full",
+            }
+        ),
     )
     password = forms.CharField(
-        label='كلمة المرور',
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'أدخل كلمة المرور',
-            'class': 'input input-bordered w-full'
-        })
+        label="كلمة المرور",
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "أدخل كلمة المرور",
+                "class": "input input-bordered w-full",
+            }
+        ),
     )
     faculty = forms.ModelChoiceField(
         queryset=Faculty.objects.none(),
-        label='الكلية',
+        label="الكلية",
         required=False,
-        empty_label='-- اختر الكلية --',
-        widget=forms.Select(attrs={
-            'class': 'select select-bordered w-full'
-        })
+        empty_label="-- اختر الكلية --",
+        widget=forms.Select(attrs={"class": "select select-bordered w-full"}),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['faculty'].queryset = Faculty.objects.all().order_by('faculty_ar_name')
+        self.fields["faculty"].queryset = Faculty.objects.all().order_by(
+            "faculty_ar_name"
+        )

@@ -4,15 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('administration', '0001_initial'),
+        ("administration", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='users_profile',
-            name='role',
-            field=models.CharField(choices=[('supervisor', 'مشرف'), ('director', 'مدير'), ('auditor', 'مدقق'), ('employee', 'موظف')], default='employee', max_length=20, verbose_name='الدور الوظيفي'),
+            model_name="users_profile",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("supervisor", "مشرف"),
+                    ("director", "مدير"),
+                    ("auditor", "مدقق"),
+                    ("employee", "موظف"),
+                ],
+                default="employee",
+                max_length=20,
+                verbose_name="الدور الوظيفي",
+            ),
         ),
     ]

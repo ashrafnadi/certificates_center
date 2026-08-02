@@ -5,16 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('administration', '0002_users_profile_role'),
-        ('graduates', '0001_initial'),
+        ("administration", "0002_users_profile_role"),
+        ("graduates", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='graduate',
-            name='faculty_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.faculty'),
+            model_name="graduate",
+            name="faculty_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.faculty",
+            ),
         ),
     ]

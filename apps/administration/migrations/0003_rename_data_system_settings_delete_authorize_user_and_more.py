@@ -6,107 +6,151 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('administration', '0002_users_profile_role'),
+        ("administration", "0002_users_profile_role"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='data',
-            new_name='System_Settings',
+            old_name="data",
+            new_name="System_Settings",
         ),
         migrations.DeleteModel(
-            name='authorize_user',
+            name="authorize_user",
         ),
         migrations.DeleteModel(
-            name='certificate_counter',
+            name="certificate_counter",
         ),
         migrations.DeleteModel(
-            name='history',
+            name="history",
         ),
         migrations.DeleteModel(
-            name='motherboard',
+            name="motherboard",
         ),
         migrations.RenameField(
-            model_name='users_profile',
-            old_name='user_id',
-            new_name='id',
+            model_name="users_profile",
+            old_name="user_id",
+            new_name="id",
         ),
         migrations.AddField(
-            model_name='users_profile',
-            name='user',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="users_profile",
+            name="user",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='authenticated_user',
-            name='authorize_user_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.users_profile'),
+            model_name="authenticated_user",
+            name="authorize_user_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.users_profile",
+            ),
         ),
         migrations.AlterField(
-            model_name='authenticated_user',
-            name='faculty_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.faculty'),
+            model_name="authenticated_user",
+            name="faculty_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.faculty",
+            ),
         ),
         migrations.AlterField(
-            model_name='authenticated_user',
-            name='isadd',
+            model_name="authenticated_user",
+            name="isadd",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='authenticated_user',
-            name='iscommit',
+            model_name="authenticated_user",
+            name="iscommit",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='authenticated_user',
-            name='isdelete',
+            model_name="authenticated_user",
+            name="isdelete",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='authenticated_user',
-            name='isedit',
+            model_name="authenticated_user",
+            name="isedit",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='authenticated_user',
-            name='isprint',
+            model_name="authenticated_user",
+            name="isprint",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='authenticated_user',
-            name='isview',
+            model_name="authenticated_user",
+            name="isview",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='degree',
-            name='faculty_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.faculty'),
+            model_name="degree",
+            name="faculty_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.faculty",
+            ),
         ),
         migrations.AlterField(
-            model_name='section',
-            name='faculty_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.faculty'),
+            model_name="section",
+            name="faculty_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.faculty",
+            ),
         ),
         migrations.AlterField(
-            model_name='specialization',
-            name='section_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.section'),
+            model_name="specialization",
+            name="section_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.section",
+            ),
         ),
         migrations.AlterField(
-            model_name='transaction',
-            name='faculty_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.faculty'),
+            model_name="transaction",
+            name="faculty_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.faculty",
+            ),
         ),
         migrations.AlterField(
-            model_name='upload_error',
-            name='faculty_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.faculty'),
+            model_name="upload_error",
+            name="faculty_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.faculty",
+            ),
         ),
         migrations.AlterField(
-            model_name='upload_error',
-            name='user_id',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='administration.users_profile'),
+            model_name="upload_error",
+            name="user_id",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="administration.users_profile",
+            ),
         ),
     ]

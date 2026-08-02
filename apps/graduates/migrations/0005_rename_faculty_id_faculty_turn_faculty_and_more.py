@@ -5,34 +5,42 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('graduates', '0004_rename_faculty_id_graduate_faculty_and_more'),
+        ("graduates", "0004_rename_faculty_id_graduate_faculty_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='faculty_turn',
-            old_name='faculty_id',
-            new_name='faculty',
+            model_name="faculty_turn",
+            old_name="faculty_id",
+            new_name="faculty",
         ),
         migrations.RemoveField(
-            model_name='certificate',
-            name='graduate_id',
+            model_name="certificate",
+            name="graduate_id",
         ),
         migrations.RemoveField(
-            model_name='history',
-            name='row_id',
+            model_name="history",
+            name="row_id",
         ),
         migrations.AddField(
-            model_name='certificate',
-            name='graduate',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='graduates.graduate'),
+            model_name="certificate",
+            name="graduate",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="graduates.graduate",
+            ),
         ),
         migrations.AddField(
-            model_name='history',
-            name='graduate',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='graduates.graduate'),
+            model_name="history",
+            name="graduate",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="graduates.graduate",
+            ),
             preserve_default=False,
         ),
     ]

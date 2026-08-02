@@ -555,3 +555,96 @@
     border: 3px solid var(--bs-primary);
     border-radius: 12px;
 }
+
+/* ============================================
+ GRADUATE LIST — MOVED FROM INLINE STYLES
+ ============================================ */
+
+/* Graduate avatar (initials circle) */
+.grad-avatar {
+    width: 36px;
+    height: 36px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Small font utility */
+.fs-sm {
+    font-size: 0.8rem;
+}
+
+/* Debug alert compact */
+.alert-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
+/* ============================================
+ MODAL STYLES
+ ============================================ */
+
+/* Graduate photo in modal */
+.graduate-photo {
+    width: 180px;
+    height: 220px;
+    object-fit: cover;
+    border: 3px solid var(--bs-primary);
+    border-radius: 12px;
+}
+
+/* Modal label styling */
+.modal-body label.text-muted {
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+}
+
+/* ============================================
+ GRADUATE DETAIL INLINE PANEL
+ ============================================ */
+
+/* Inline detail photo */
+.detail-photo {
+    width: 180px;
+    height: 220px;
+    object-fit: cover;
+    border: 3px solid var(--bs-primary);
+    border-radius: 12px;
+}
+
+/* ============================================
+ GRADUATES TABLE FILTER
+ ============================================ */
+
+/* Filter input wrapper inside card header */
+.grad-filter-wrap {
+    max-width: 320px;
+    width: 100%;
+}
+
+.grad-filter-wrap .input-group {
+    border-radius: var(--bs-border-radius);
+    overflow: hidden;
+}
+
+.grad-filter-wrap .form-control {
+    font-size: 0.9rem;
+}
+
+.grad-filter-wrap .form-control:focus {
+    box-shadow: none;
+    border-color: var(--bs-border-color);
+}
+
+/* Responsive: full width on small screens */
+@media (max-width: 768px) {
+    .grad-filter-wrap {
+        max-width: 100%;
+    }
+}
