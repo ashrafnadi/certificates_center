@@ -68,11 +68,11 @@
                                     </div>
                                     <div class="col-md-4">
                                         <label class="text-muted">الدرجة العلمية</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.grade_name_ar|default:'—' }}</p>
+                                        <p class="fw-semibold mb-0">{{ selected_graduate.regulation.degree|default:'—' }}</p>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="text-muted">التقدير</label>
-                                        <p class="fw-semibold mb-0">{{ selected_graduate.grade_letter|default:'—' }}</p>
+                                        <p class="fw-semibold mb-0">{{ selected_graduate.grade.grade_name_ar|default:'—' }} - {{ selected_graduate.grade_letter|default:'—' }}</p>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="text-muted">المجموع</label>

@@ -257,7 +257,7 @@ class Grade(models.Model):
 class Regulation(models.Model):
     regulation_id = models.BigIntegerField(primary_key=True)
     regulation_ar_name = models.CharField(max_length=200)
-    degree_id = models.BigIntegerField()
+    degree = models.ForeignKey("Degree", on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         ordering = ("regulation_id",)
