@@ -151,3 +151,6 @@ GitHub.sublime-settings
 # Text
 old.txt
 *old*.txt
+
+uploads
+uploads/*
