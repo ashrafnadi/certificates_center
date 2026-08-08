@@ -1,0 +1,76 @@
+{% if graduates %}
+    <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="bi bi-table me-2"></i>قائمة الخريجين</h6>
+            <span class="badge bg-primary">{{ graduates|length }} خريج</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>الاسم</th>
+                            <th>رقم البطاقة</th>
+                            <th>التخصص</th>
+                            <th>الدور</th>
+                            <th>الدرجة</th>
+                            <th>التحقق</th>
+                            <th>الملاحظات</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for g in graduates %}
+                            <tr {% if g.ischeked == "N" %}class="table-warning"{% endif %}>
+                                <td>{{ g.graduate_id }}</td>
+                                <td>
+                                    <div class="fw-bold">{{ g.graduate_ar_name }}</div>
+                                    <div class="small text-muted text-en">{{ g.graduate_en_name }}</div>
+                                </td>
+                                <td>{{ g.graduate_id_card }}</td>
+                                <td>{{ g.specialization.specialization_ar_name|default:"—" }}</td>
+                                <td>{{ g.faculty_turn.turn_ar_name|default:"—" }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ g.computed_grade_ar|default:g.grade_name_ar|default:"—" }}</span>
+                                </td>
+                                <td id="check-status-{{ g.graduate_id }}">
+                                    {% if g.ischeked == "Y" %}
+                                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>تم</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-hourglass me-1"></i>قيد المراجعة</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ g.graduate_notes|truncatechars:30|default:"—" }}</small>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"
+                                            hx-get="{% url 'graduates:auditor_list' %}?graduate_id={{ g.graduate_id }}"
+                                            hx-target="#edit-modal-container"
+                                            hx-trigger="click"
+                                            title="عرض التفاصيل والتعديل">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info d-flex align-items-center">
+        <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+        <div>
+            <strong>لا توجد نتائج</strong>
+            <br />
+            {% if show_unchecked_only %}
+                لا يوجد خريجون غير مدققين مطابقين لمعايير التصفية.
+            {% else %}
+                لا يوجد خريجون مطابقون لمعايير البحث.
+            {% endif %}
+        </div>
+    </div>
+{% endif %}

@@ -75,7 +75,6 @@ class Graduate(models.Model):
     graduate_ar_pob = models.CharField(max_length=100)
     graduate_en_pob = models.CharField(max_length=100)
     graduate_dob = models.DateTimeField()
-    # db_column="nationality" because old schema used BigIntegerField named "nationality"
     nationality = models.ForeignKey(
         Nationality,
         on_delete=models.CASCADE,
@@ -94,7 +93,6 @@ class Graduate(models.Model):
     grade_name_en = models.CharField(max_length=50, blank=True, null=True)
     ischeked = models.CharField(max_length=2)
     ischeked2 = models.CharField(max_length=20)
-    # db_column="specialization" because old schema used BigIntegerField named "specialization"
     specialization = models.ForeignKey(
         Specialization,
         on_delete=models.CASCADE,
@@ -102,7 +100,6 @@ class Graduate(models.Model):
         null=True,
         db_column="specialization",
     )
-    # db_column="faculty_turn" because old schema used BigIntegerField named "faculty_turn"
     faculty_turn = models.ForeignKey(
         Faculty_Turn,
         on_delete=models.CASCADE,
@@ -110,7 +107,6 @@ class Graduate(models.Model):
         null=True,
         db_column="faculty_turn",
     )
-    # db_column="regulation" because old schema used BigIntegerField named "regulation"
     regulation = models.ForeignKey(
         Regulation,
         on_delete=models.CASCADE,
@@ -119,7 +115,6 @@ class Graduate(models.Model):
         db_column="regulation",
     )
     isdelete = models.CharField(max_length=2, blank=True, null=True)
-    # db_column="transaction" because old schema used BigIntegerField named "transaction"
     transaction = models.ForeignKey(
         Transaction,
         on_delete=models.CASCADE,
@@ -129,7 +124,6 @@ class Graduate(models.Model):
     )
     lastuser = models.BigIntegerField()
     transdesciption = models.CharField(max_length=200)
-    # db_column="faculty" because old schema used BigIntegerField named "faculty"
     faculty = models.ForeignKey(
         Faculty,
         on_delete=models.CASCADE,

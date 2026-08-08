@@ -1,0 +1,13 @@
+<label class="form-label small text-muted">التخصص</label>
+<select name="specialization_id"
+        class="form-select"
+        hx-get="{% url 'graduates:auditor_list' %}"
+        hx-target="#graduates-table-container"
+        hx-trigger="change"
+        hx-include="#auditor-filter-form"
+        hx-push-url="true">
+    <option value="">-- جميع التخصصات --</option>
+    {% for spec in specializations %}
+        <option value="{{ spec.specialization_id }}">{{ spec.specialization_ar_name }}</option>
+    {% endfor %}
+</select>

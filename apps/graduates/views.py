@@ -4,7 +4,10 @@ import traceback
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from apps.administration.models import (
     Faculty,
@@ -14,7 +17,7 @@ from apps.administration.models import (
     Upload_Error,
     Users_Profile,
 )
-from apps.graduates.models import Certificate, Graduate, History
+from apps.graduates.models import Certificate, Graduate, History, Faculty_Turn
 
 logger = logging.getLogger(__name__)
 
@@ -360,3 +363,282 @@ def graduate_list(request):
             return render(request, "graduates/partials/faculty_changed.html", context)
 
     return render(request, "graduates/graduate_list.html", context)
+
+
+# AUDITOR VIEWS
+
+
+def _auditor_auth_check(request):
+    """Helper to verify auditor access."""
+    user = request.user
+    role = request.session.get("user_role") or getattr(user, "role", "employee")
+    if role != "auditor" and not getattr(user, "is_staff", False):
+        return False
+    return True
+
+
+@login_required
+def auditor_graduate_list(request):
+    """
+    Auditor view:
+    - See graduates from assigned faculty only
+    - Read-only for checked graduates (ischeked='Y')
+    - Can edit unchecked graduates (ischeked='N'): toggle check + edit notes
+    - Filter unchecked graduates by section, specialization, turn year
+    """
+    if not _auditor_auth_check(request):
+        return HttpResponse("غير مصرح", status=403)
+
+    selected_faculty_id = request.session.get("selected_faculty_id")
+    selected_faculty_name = request.session.get("selected_faculty_name", "")
+
+    if not selected_faculty_id:
+        return render(
+            request,
+            "graduates/auditor/no_faculty.html",
+            {
+                "message": "لم يتم اختيار كلية. يرجى تسجيل الدخول مرة أخرى واختيار الكلية."
+            },
+        )
+
+    section_id = request.GET.get("section_id", "")
+    specialization_id = request.GET.get("specialization_id", "")
+    turn_id = request.GET.get("turn_id", "")
+
+    # FIX: Properly detect unchecked checkbox state
+    # Checkbox sends "unchecked=1" when checked, "unchecked=0" when unchecked (via hidden input)
+    # On first load (no unchecked in GET), default to True for auditors
+    if "unchecked" in request.GET:
+        show_unchecked_only = request.GET.get("unchecked") == "1"
+    else:
+        show_unchecked_only = True
+
+    graduate_id = request.GET.get("graduate_id", "")
+    search_query = request.GET.get("q", "").strip()
+
+    current_faculty = get_object_or_404(Faculty, pk=int(selected_faculty_id))
+
+    sections = Section.objects.filter(faculty=current_faculty).order_by(
+        "section_ar_name"
+    )
+
+    specializations = []
+    if section_id:
+        try:
+            specializations = Specialization.objects.filter(
+                section_id=int(section_id)
+            ).order_by("specialization_ar_name")
+        except (ValueError, TypeError):
+            pass
+
+    turns = Faculty_Turn.objects.filter(faculty=current_faculty).order_by(
+        "-turn_year", "-turn_cad_date"
+    )
+
+    graduates = Graduate.objects.filter(faculty=current_faculty)
+
+    if show_unchecked_only:
+        graduates = graduates.filter(ischeked="N")
+
+    if specialization_id:
+        try:
+            graduates = graduates.filter(specialization_id=int(specialization_id))
+        except (ValueError, TypeError):
+            pass
+    elif section_id:
+        try:
+            spec_ids = Specialization.objects.filter(
+                section_id=int(section_id)
+            ).values_list("specialization_id", flat=True)
+            graduates = graduates.filter(specialization_id__in=spec_ids)
+        except (ValueError, TypeError):
+            pass
+
+    if turn_id:
+        try:
+            graduates = graduates.filter(faculty_turn_id=int(turn_id))
+        except (ValueError, TypeError):
+            pass
+
+    if search_query:
+        graduates = graduates.filter(
+            Q(graduate_ar_name__icontains=search_query)
+            | Q(graduate_en_name__icontains=search_query)
+            | Q(graduate_id_card__icontains=search_query)
+            | Q(grade_name_ar__icontains=search_query)
+            | Q(graduate_notes__icontains=search_query)
+        )
+
+    graduates = graduates.select_related(
+        "nationality", "faculty", "specialization", "faculty_turn", "regulation"
+    ).order_by("-graduate_id")
+
+    selected_graduate = None
+    if graduate_id:
+        try:
+            selected_graduate = get_object_or_404(
+                Graduate.objects.select_related(
+                    "nationality",
+                    "faculty",
+                    "specialization",
+                    "faculty_turn",
+                    "regulation",
+                    "regulation__degree",
+                ),
+                graduate_id=int(graduate_id),
+                faculty=current_faculty,
+            )
+        except (ValueError, TypeError):
+            selected_graduate = None
+
+    context = {
+        "user_role": request.session.get("user_role", "auditor"),
+        "selected_faculty_name": selected_faculty_name,
+        "selected_faculty": current_faculty,
+        "selected_faculty_id": str(selected_faculty_id),
+        "sections": sections,
+        "specializations": specializations,
+        "turns": turns,
+        "graduates": graduates,
+        "selected_section_id": section_id,
+        "selected_specialization_id": specialization_id,
+        "selected_turn_id": turn_id,
+        "show_unchecked_only": show_unchecked_only,
+        "selected_graduate": selected_graduate,
+        "search_query": search_query,
+        "unchecked_count": Graduate.objects.filter(
+            faculty=current_faculty, ischeked="N"
+        ).count(),
+        "total_count": Graduate.objects.filter(faculty=current_faculty).count(),
+    }
+
+    is_htmx = request.headers.get("HX-Request") == "true"
+    if is_htmx:
+        if graduate_id:
+            return render(
+                request, "graduates/auditor/partials/graduate_edit_form.html", context
+            )
+        # FIX: Return full content (filters + table), not just table
+        return render(
+            request, "graduates/auditor/partials/auditor_content.html", context
+        )
+
+    return render(request, "graduates/auditor/auditor_list.html", context)
+
+
+@login_required
+@require_POST
+def auditor_toggle_check(request, graduate_id):
+    """Auditor toggles ischeked from 'N' to 'Y'. Cannot toggle back."""
+    if not _auditor_auth_check(request):
+        return HttpResponse("غير مصرح", status=403)
+
+    selected_faculty_id = request.session.get("selected_faculty_id")
+    if not selected_faculty_id:
+        return HttpResponse("لم يتم اختيار كلية", status=400)
+
+    try:
+        graduate = get_object_or_404(
+            Graduate,
+            graduate_id=int(graduate_id),
+            faculty_id=int(selected_faculty_id),
+            ischeked="N",
+        )
+
+        old_value = graduate.ischeked
+        graduate.ischeked = "Y"
+        graduate.lastuser = getattr(request.user, "user_id", request.user.id)
+        graduate.save(update_fields=["ischeked", "lastuser"])
+
+        History.objects.create(
+            history_id=int(timezone.now().timestamp() * 1000),
+            graduate=graduate,
+            history_date=timezone.now(),
+            history_field="ischeked",
+            history_old=old_value,
+            history_new="Y",
+            history_type="AUDIT",
+            history_desc="تم التحقق من بيانات الخريج بواسطة المدقق",
+            faculty_id=int(selected_faculty_id),
+        )
+
+        Transaction.objects.create(
+            transaction_id=int(timezone.now().timestamp() * 1000),
+            transaction_date=timezone.now(),
+            user_id=getattr(request.user, "id", None),
+            transaction_descripsion=f"تحقق من خريج #{graduate.graduate_id}",
+            faculty_id=int(selected_faculty_id),
+        )
+
+        if request.headers.get("HX-Request"):
+            return render(
+                request,
+                "graduates/auditor/partials/check_badge.html",
+                {
+                    "graduate": graduate,
+                    "message": "تم التحقق بنجاح",
+                },
+            )
+        return JsonResponse({"success": True, "message": "تم التحقق بنجاح"})
+
+    except Exception as e:
+        logger.exception("Toggle check failed")
+        if request.headers.get("HX-Request"):
+            return HttpResponse(f"خطأ: {str(e)}", status=500)
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def auditor_update_notes(request, graduate_id):
+    """Auditor updates graduate_notes for unchecked graduates only."""
+    if not _auditor_auth_check(request):
+        return HttpResponse("غير مصرح", status=403)
+
+    selected_faculty_id = request.session.get("selected_faculty_id")
+    if not selected_faculty_id:
+        return HttpResponse("لم يتم اختيار كلية", status=400)
+
+    notes = request.POST.get("graduate_notes", "").strip()
+
+    try:
+        graduate = get_object_or_404(
+            Graduate,
+            graduate_id=int(graduate_id),
+            faculty_id=int(selected_faculty_id),
+            ischeked="N",
+        )
+
+        old_notes = graduate.graduate_notes or ""
+        graduate.graduate_notes = notes
+        graduate.lastuser = getattr(request.user, "user_id", request.user.id)
+        graduate.save(update_fields=["graduate_notes", "lastuser"])
+
+        History.objects.create(
+            history_id=int(timezone.now().timestamp() * 1000),
+            graduate=graduate,
+            history_date=timezone.now(),
+            history_field="graduate_notes",
+            history_old=old_notes,
+            history_new=notes,
+            history_type="AUDIT_NOTES",
+            history_desc="تعديل ملاحظات الخريج بواسطة المدقق",
+            faculty_id=int(selected_faculty_id),
+        )
+
+        if request.headers.get("HX-Request"):
+            return render(
+                request,
+                "graduates/auditor/partials/notes_display.html",
+                {
+                    "graduate": graduate,
+                    "message": "تم حفظ الملاحظات",
+                },
+            )
+        return JsonResponse({"success": True, "message": "تم حفظ الملاحظات"})
+
+    except Exception as e:
+        logger.exception("Update notes failed")
+        if request.headers.get("HX-Request"):
+            return HttpResponse(f"خطأ: {str(e)}", status=500)
+        return JsonResponse({"success": False, "error": str(e)}, status=500)

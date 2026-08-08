@@ -1,0 +1,48 @@
+auditor_list_fixed.html{% extends "base.html" %}
+{% load static %}
+{% block title %}قائمة الخريجين - المدقق | {{ block.super }}{% endblock %}
+{% block content %}
+  <div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="mb-0">
+          <i class="bi bi-clipboard-check text-primary me-2"></i>
+          قائمة الخريجين - المدقق
+        </h4>
+        <small class="text-muted">{{ selected_faculty_name }}</small>
+      </div>
+      <div class="text-start">
+        <span class="badge bg-warning text-dark">
+          <i class="bi bi-exclamation-circle me-1"></i>
+          غير مدقق: {{ unchecked_count }}
+        </span>
+        <span class="badge bg-secondary ms-1">الإجمالي: {{ total_count }}</span>
+      </div>
+    </div>
+    <!-- Content Wrapper (filters + table) -->
+    <div id="auditor-content-wrapper">{% include "graduates/auditor/partials/auditor_content.html" %}</div>
+    <!-- Edit Modal Container -->
+    <div id="edit-modal-container"></div>
+  </div>
+{% endblock %}
+{% block extra_js %}
+  <script>
+      document.body.addEventListener('htmx:beforeSwap', function(evt) {
+          if (evt.detail.target.id === 'edit-modal-container') {
+              const existing = document.getElementById('auditorEditModal');
+              if (existing) existing.remove();
+              document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+              document.body.classList.remove('modal-open');
+              document.body.style.overflow = '';
+          }
+      });
+
+      document.body.addEventListener('htmx:afterSwap', function(evt) {
+          if (evt.detail.target.id === 'edit-modal-container' && document.getElementById('auditorEditModal')) {
+              document.body.classList.add('modal-open');
+              document.body.style.overflow = 'hidden';
+          }
+      });
+  </script>
+{% endblock %}

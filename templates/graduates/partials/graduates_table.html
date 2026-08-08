@@ -67,8 +67,8 @@
                                 <td class="pe-4" data-label="إجراءات">
                                     <button type="button"
                                             class="btn btn-sm btn-outline-primary"
-                                            hx-get="{% url 'graduates:graduate_list' %}?graduate_id={{ g.graduate_id }}&specialization_id={{ selected_specialization_id|default:'' }}&section_id={{ selected_section_id|default:'' }}&faculty_id={{ selected_faculty.faculty_id|default:selected_faculty_id|default:'' }}"
-                                            hx-target="#modalContainer"
+                                            hx-get="{% url 'graduates:auditor_list' %}?graduate_id={{ g.graduate_id }}"
+                                            hx-target="#edit-modal-container"
                                             hx-swap="innerHTML">
                                         <i class="bi bi-eye"></i>
                                     </button>

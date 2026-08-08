@@ -1,0 +1,169 @@
+{% load static %}
+<!-- Auditor Edit Modal -->
+<div class="modal fade show modal-force-show"
+     id="auditorEditModal"
+     tabindex="-1"
+     aria-modal="true"
+     role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header
+                        {% if selected_graduate.ischeked == 'N' %}bg-warning{% else %}bg-success{% endif %}
+                        text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-person-check me-2"></i>
+                    {% if selected_graduate.ischeked == 'N' %}
+                        مراجعة بيانات الخريج
+                    {% else %}
+                        عرض بيانات الخريج
+                    {% endif %}
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="إغلاق"
+                        onclick="document.getElementById('auditorEditModal').remove(); document.querySelectorAll('.modal-backdrop').forEach(el=>el.remove()); document.body.classList.remove('modal-open'); document.body.style.overflow='';">
+                </button>
+            </div>
+            <div class="modal-body">
+                {% if selected_graduate %}
+                    <div class="alert
+                                {% if selected_graduate.ischeked == 'N' %}alert-warning{% else %}alert-success{% endif %}">
+                        <i class="bi bi-{% if selected_graduate.ischeked == 'N' %}exclamation-triangle{% else %}check-circle{% endif %}
+                                  me-2"></i>
+                        {% if selected_graduate.ischeked == 'N' %}
+                            <strong>يمكن التعديل:</strong> هذا الخريج غير مدقق. يمكنك التحقق من البيانات وإضافة ملاحظات.
+                        {% else %}
+                            <strong>عرض فقط:</strong> هذا الخريج مدقق مسبقاً. لا يمكن تعديل أي بيانات.
+                        {% endif %}
+                    </div>
+                    <!-- Graduate Info (Read-only) -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="text-muted small">الاسم</label>
+                            <p class="fw-bold mb-1">{{ selected_graduate.graduate_ar_name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted small">رقم البطاقة</label>
+                            <p class="fw-bold mb-1">{{ selected_graduate.graduate_id_card }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted small">التخصص</label>
+                            <p class="fw-bold mb-1">{{ selected_graduate.specialization.specialization_ar_name|default:"—" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted small">الدرجة العلمية</label>
+                            <p class="fw-bold mb-1">{{ selected_graduate.regulation.degree.degree_ar_name|default:"—" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted small">التقدير</label>
+                            <p class="fw-bold mb-1">{{ selected_graduate.computed_grade_ar|default:selected_graduate.grade_name_ar|default:"—" }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-muted small">الدرجة / المجموع</label>
+                            <p class="fw-bold mb-1">{{ selected_graduate.score|default:"—" }}</p>
+                        </div>
+                    </div>
+                    <hr />
+                    <!-- Editable Section (only if unchecked) -->
+                    {% if selected_graduate.ischeked == 'N' %}
+                        <form id="auditor-edit-form">
+                            {% csrf_token %}
+                            <!-- Check Box -->
+                            <div class="mb-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="checkToggle"
+                                           name="ischeked"
+                                           value="Y"
+                                           hx-post="{% url 'graduates:auditor_toggle_check' selected_graduate.graduate_id %}"
+                                           hx-target="#check-result"
+                                           hx-swap="innerHTML"
+                                           hx-confirm="هل أنت متأكد من التحقق من بيانات هذا الخريج؟ لا يمكن التراجع عن هذا الإجراء."
+                                           style="width: 3em;
+                                                  height: 1.5em" />
+                                    <label class="form-check-label fw-bold ms-2" for="checkToggle">
+                                        <i class="bi bi-shield-check text-warning me-1"></i>
+                                        تم التحقق من بيانات الخريج
+                                    </label>
+                                </div>
+                                <div id="check-result" class="mt-2"></div>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    عند التأشير، سيتم حفظ التحقق وإغلاق نافذة التعديل. لن تتمكن من تعديل البيانات بعد ذلك.
+                                </small>
+                            </div>
+                            <!-- Notes Text Box -->
+                            <div class="mb-3">
+                                <label for="graduateNotes" class="form-label fw-bold">
+                                    <i class="bi bi-pencil-square me-1"></i>ملاحظات المدقق
+                                </label>
+                                <textarea class="form-control"
+                                          id="graduateNotes"
+                                          name="graduate_notes"
+                                          rows="3"
+                                          placeholder="أضف ملاحظاتك هنا...">{{ selected_graduate.graduate_notes|default:"" }}</textarea>
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <small class="text-muted">يمكنك إضافة ملاحظات قبل التحقق النهائي.</small>
+                                    <button type="button"
+                                            class="btn btn-sm btn-success"
+                                            hx-post="{% url 'graduates:auditor_update_notes' selected_graduate.graduate_id %}"
+                                            hx-target="#notes-result"
+                                            hx-swap="innerHTML"
+                                            hx-include="#graduateNotes"
+                                            hx-indicator="#notes-spinner">
+                                        <i class="bi bi-save me-1"></i> حفظ الملاحظات
+                                    </button>
+                                </div>
+                                <div id="notes-spinner" class="htmx-indicator mt-2">
+                                    <span class="spinner-border spinner-border-sm text-success" role="status"></span>
+                                    <span class="small text-muted">جاري الحفظ...</span>
+                                </div>
+                                <div id="notes-result" class="mt-2"></div>
+                            </div>
+                        </form>
+                    {% else %}
+                        <!-- Read-only display for checked graduates -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="bi bi-shield-check me-1"></i>حالة التحقق
+                            </label>
+                            <p class="fw-bold text-success">
+                                <i class="bi bi-check-circle-fill me-1"></i>تم التحقق من بيانات هذا الخريج
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="bi bi-sticky me-1"></i>ملاحظات
+                            </label>
+                            <div class="p-3 bg-light rounded border">
+                                {{ selected_graduate.graduate_notes|default:"لا توجد ملاحظات"|linebreaks }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        لم يتم العثور على بيانات الخريج.
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="document.getElementById('auditorEditModal').remove(); document.querySelectorAll('.modal-backdrop').forEach(el=>el.remove()); document.body.classList.remove('modal-open'); document.body.style.overflow='';">
+                    <i class="bi bi-x-lg me-1"></i> إغلاق
+                </button>
+                {% if selected_graduate and selected_graduate.ischeked == 'N' %}
+                    <button type="button"
+                            class="btn btn-primary"
+                            onclick="document.getElementById('checkToggle').click();">
+                        <i class="bi bi-check-lg me-1"></i> تحقق وحفظ
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-backdrop fade show"></div>

@@ -1,15 +1,17 @@
-{% if request.user.is_superuser %}
-    {% include 'partials/admin_side_menu.html' %}
-{% elif request.user.profile.is_supervisor %}
-    {% include 'partials/supervisor_side_menu.html' %}
-{% elif request.user.profile.is_director %}
-    {% include 'partials/director_side_menu.html' %}
-{% elif request.user.profile.is_auditor %}
-    {% include 'partials/auditor_side_menu.html' %}
-{% elif request.user.profile.is_employee %}
-    {% include 'partials/employee_side_menu.html' %}
-{% else %}
-    <div>
-        <p class="text-center">No menu available for your role.</p>
-    </div>
-{% endif %}
+{% with role=request.session.user_role %}
+    {% if request.user.is_superuser %}
+        {% include 'partials/admin_side_menu.html' %}
+    {% elif role == "supervisor" %}
+        {% include 'partials/supervisor_side_menu.html' %}
+    {% elif role == "director" %}
+        {% include 'partials/director_side_menu.html' %}
+    {% elif role == "auditor" %}
+        {% include 'partials/auditor_side_menu.html' %}
+    {% elif role == "employee" %}
+        {% include 'partials/employee_side_menu.html' %}
+    {% else %}
+        <div>
+            <p class="text-center">No menu available for your role.</p>
+        </div>
+    {% endif %}
+{% endwith %}

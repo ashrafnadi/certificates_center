@@ -1,0 +1,28 @@
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="bi bi-check-circle-fill me-2"></i>
+    <strong>تم التحقق بنجاح!</strong> تم حفظ بيانات الخريج وإغلاق نافذة التعديل.
+    <button type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"></button>
+</div>
+<script>
+    // Close modal and refresh list after successful check
+    setTimeout(function() {
+        const modal = document.getElementById('auditorEditModal');
+        if (modal) {
+            modal.remove();
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        }
+        // Refresh the graduates table
+        const tableContainer = document.getElementById('graduates-table-container');
+        if (tableContainer) {
+            htmx.ajax('GET', window.location.href + '&refresh_list=1', {
+                target: '#graduates-table-container',
+                swap: 'innerHTML'
+            });
+        }
+    }, 1500);
+</script>
